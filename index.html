@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Phase 10" />
+  <title>Phase 10 Punkterechner</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, sans-serif;
+      background: #f2f2f7;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      background: white;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    #add-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    #add-btn:active { background: #005ecb; }
+
+    .player-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .player-name {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .remove-btn {
+      background: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .label {
+      font-size: 14px;
+      color: #666;
+      width: 70px;
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 600;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .plus-btn {
+      background: #34c759;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .plus-btn:active { background: #248a3d; }
+
+    .round-input {
+      width: 70px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal-overlay.visible { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      width: 85%;
+      max-width: 340px;
+      text-align: center;
+    }
+
+    .modal h2 { font-size: 20px; margin-bottom: 16px; }
+
+    .modal input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    .modal-btns { display: flex; gap: 10px; }
+
+    .modal-btns button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-confirm { background: #007aff; color: white; }
+    .btn-cancel  { background: #e5e5ea; color: #333; }
+
+    /* Win modal */
+    #win-modal .modal h2 { font-size: 24px; }
+    #win-modal .modal p  { font-size: 16px; color: #555; margin-bottom: 20px; }
+    #win-modal .modal button {
+      width: 100%;
+      padding: 14px;
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Phase 10 Punkterechner</h1>
+  <button id="add-btn" onclick="openAddModal()">+ Spieler hinzufügen</button>
+  <div id="players"></div>
+
+  <!-- Add Player Modal -->
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal">
+      <h2>Spieler hinzufügen</h2>
+      <input type="text" id="name-input" placeholder="Name eingeben" />
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeAddModal()">Abbrechen</button>
+        <button class="btn-confirm" onclick="addPlayer()">Hinzufügen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win Modal -->
+  <div class="modal-overlay" id="win-modal">
+    <div class="modal">
+      <h2>Gewonnen!</h2>
+      <p id="win-text"></p>
+      <button onclick="playAgain()">Nochmal spielen</button>
+    </div>
+  </div>
+
+  <script>
+    let players = {};
+    let winTarget = null;
+
+    function openAddModal() {
+      document.getElementById('name-input').value = '';
+      document.getElementById('add-modal').classList.add('visible');
+      setTimeout(() => document.getElementById('name-input').focus(), 100);
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-modal').classList.remove('visible');
+    }
+
+    document.getElementById('name-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addPlayer();
+    });
+
+    function addPlayer() {
+      const name = document.getElementById('name-input').value.trim();
+      if (!name) return;
+      closeAddModal();
+
+      const id = Date.now();
+      players[id] = { phase: 0, total: 0 };
+
+      const card = document.createElement('div');
+      card.className = 'player-card';
+      card.id = 'player-' + id;
+      card.innerHTML = `
+        <div class="player-header">
+          <span class="player-name">${escapeHtml(name)}</span>
+          <button class="remove-btn" onclick="removePlayer(${id})">✕</button>
+        </div>
+        <div class="row">
+          <span class="label">Phase</span>
+          <span class="value" id="phase-${id}">0</span>
+          <button class="plus-btn" onclick="increasePhase(${id}, '${escapeHtml(name)}')">+</button>
+        </div>
+        <div class="row">
+          <span class="label">Punkte</span>
+          <span class="value" id="total-${id}">0</span>
+        </div>
+        <div class="row">
+          <span class="label">Runde</span>
+          <input class="round-input" type="number" id="round-${id}" value="0" />
+          <button class="plus-btn" onclick="addPoints(${id})">+</button>
+        </div>
+      `;
+      document.getElementById('players').appendChild(card);
+    }
+
+    function increasePhase(id, name) {
+      players[id].phase++;
+      document.getElementById('phase-' + id).textContent = players[id].phase;
+      if (players[id].phase >= 10) {
+        winTarget = id;
+        document.getElementById('win-text').textContent = `Herzlichen Glückwunsch, ${name}!`;
+        document.getElementById('win-modal').classList.add('visible');
+      }
+    }
+
+    function addPoints(id) {
+      const input = document.getElementById('round-' + id);
+      const val = parseInt(input.value) || 0;
+      players[id].total += val;
+      document.getElementById('total-' + id).textContent = players[id].total;
+      input.value = '0';
+    }
+
+    function removePlayer(id) {
+      document.getElementById('player-' + id).remove();
+      delete players[id];
+    }
+
+    function playAgain() {
+      if (winTarget !== null) {
+        players[winTarget].phase = 0;
+        players[winTarget].total = 0;
+        document.getElementById('phase-' + winTarget).textContent = '0';
+        document.getElementById('total-' + winTarget).textContent = '0';
+        document.getElementById('round-' + winTarget).value = '0';
+        winTarget = null;
+      }
+      document.getElementById('win-modal').classList.remove('visible');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>
