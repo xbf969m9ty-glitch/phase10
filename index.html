@@ -21,10 +21,48 @@
       background: white;
       padding: 14px;
       border-radius: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       font-size: 20px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
+
+    #round-bar {
+      background: white;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    #round-bar span {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    #round-bar .round-count {
+      font-size: 22px;
+      font-weight: 700;
+      color: #007aff;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .round-btn {
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .round-btn:active { background: #005ecb; }
 
     #add-btn {
       display: block;
@@ -106,6 +144,18 @@
     }
     .plus-btn:active { background: #248a3d; }
 
+    .edit-btn {
+      background: #ff9500;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .edit-btn:active { background: #c97700; }
+
     .round-input {
       width: 70px;
       padding: 8px;
@@ -163,8 +213,36 @@
     .btn-cancel  { background: #e5e5ea; color: #333; }
 
     /* Win modal */
-    #win-modal .modal h2 { font-size: 24px; }
-    #win-modal .modal p  { font-size: 16px; color: #555; margin-bottom: 20px; }
+    #win-modal .modal {
+      max-width: 380px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    #win-modal .modal h2 { font-size: 24px; margin-bottom: 8px; }
+    #win-modal .modal .win-sub { font-size: 16px; color: #555; margin-bottom: 16px; }
+
+    .scoreboard {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .scoreboard th {
+      font-size: 13px;
+      color: #888;
+      border-bottom: 1px solid #eee;
+      padding: 6px 8px;
+    }
+    .scoreboard td {
+      padding: 8px;
+      font-size: 15px;
+      border-bottom: 1px solid #f2f2f7;
+    }
+    .scoreboard tr.winner td {
+      font-weight: 700;
+      color: #007aff;
+    }
+
     #win-modal .modal button {
       width: 100%;
       padding: 14px;
@@ -181,6 +259,14 @@
 <body>
 
   <h1>Phase 10 Punkterechner</h1>
+
+  <!-- Runden-Counter -->
+  <div id="round-bar">
+    <span>Runde</span>
+    <span class="round-count" id="round-counter">1</span>
+    <button class="round-btn" onclick="incrementRound()">+</button>
+  </div>
+
   <button id="add-btn" onclick="openAddModal()">+ Spieler hinzufügen</button>
   <div id="players"></div>
 
@@ -196,18 +282,39 @@
     </div>
   </div>
 
+  <!-- Edit Points Modal -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h2>Punkte bearbeiten</h2>
+      <input type="number" id="edit-input" placeholder="Neuer Punktestand" />
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeEditModal()">Abbrechen</button>
+        <button class="btn-confirm" onclick="saveEdit()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Win Modal -->
   <div class="modal-overlay" id="win-modal">
     <div class="modal">
       <h2>Gewonnen!</h2>
-      <p id="win-text"></p>
+      <p class="win-sub" id="win-text"></p>
+      <table class="scoreboard" id="scoreboard"></table>
       <button onclick="playAgain()">Nochmal spielen</button>
     </div>
   </div>
 
   <script>
     let players = {};
+    let playerNames = {};
     let winTarget = null;
+    let editTarget = null;
+    let roundCount = 1;
+
+    function incrementRound() {
+      roundCount++;
+      document.getElementById('round-counter').textContent = roundCount;
+    }
 
     function openAddModal() {
       document.getElementById('name-input').value = '';
@@ -223,6 +330,32 @@
       if (e.key === 'Enter') addPlayer();
     });
 
+    function openEditModal(id) {
+      editTarget = id;
+      document.getElementById('edit-input').value = players[id].total;
+      document.getElementById('edit-modal').classList.add('visible');
+      setTimeout(() => document.getElementById('edit-input').focus(), 100);
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.remove('visible');
+      editTarget = null;
+    }
+
+    function saveEdit() {
+      if (editTarget === null) return;
+      const val = parseInt(document.getElementById('edit-input').value);
+      if (!isNaN(val)) {
+        players[editTarget].total = val;
+        document.getElementById('total-' + editTarget).textContent = val;
+      }
+      closeEditModal();
+    }
+
+    document.getElementById('edit-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') saveEdit();
+    });
+
     function addPlayer() {
       const name = document.getElementById('name-input').value.trim();
       if (!name) return;
@@ -230,6 +363,7 @@
 
       const id = Date.now();
       players[id] = { phase: 0, total: 0 };
+      playerNames[id] = name;
 
       const card = document.createElement('div');
       card.className = 'player-card';
@@ -247,6 +381,7 @@
         <div class="row">
           <span class="label">Punkte</span>
           <span class="value" id="total-${id}">0</span>
+          <button class="edit-btn" onclick="openEditModal(${id})">✎</button>
         </div>
         <div class="row">
           <span class="label">Runde</span>
@@ -263,6 +398,18 @@
       if (players[id].phase >= 10) {
         winTarget = id;
         document.getElementById('win-text').textContent = `Herzlichen Glückwunsch, ${name}!`;
+
+        // Scoreboard aufbauen
+        const table = document.getElementById('scoreboard');
+        table.innerHTML = `<tr><th>Spieler</th><th>Phase</th><th>Punkte</th></tr>`;
+        const sorted = Object.keys(players).sort((a, b) => players[a].total - players[b].total);
+        sorted.forEach(pid => {
+          const tr = document.createElement('tr');
+          if (parseInt(pid) === id) tr.className = 'winner';
+          tr.innerHTML = `<td>${escapeHtml(playerNames[pid])}</td><td>${players[pid].phase}</td><td>${players[pid].total}</td>`;
+          table.appendChild(tr);
+        });
+
         document.getElementById('win-modal').classList.add('visible');
       }
     }
@@ -278,17 +425,22 @@
     function removePlayer(id) {
       document.getElementById('player-' + id).remove();
       delete players[id];
+      delete playerNames[id];
     }
 
     function playAgain() {
-      if (winTarget !== null) {
-        players[winTarget].phase = 0;
-        players[winTarget].total = 0;
-        document.getElementById('phase-' + winTarget).textContent = '0';
-        document.getElementById('total-' + winTarget).textContent = '0';
-        document.getElementById('round-' + winTarget).value = '0';
-        winTarget = null;
-      }
+      // Alle Spieler zurücksetzen
+      Object.keys(players).forEach(id => {
+        players[id].phase = 0;
+        players[id].total = 0;
+        document.getElementById('phase-' + id).textContent = '0';
+        document.getElementById('total-' + id).textContent = '0';
+        document.getElementById('round-' + id).value = '0';
+      });
+      // Runden-Counter zurücksetzen
+      roundCount = 1;
+      document.getElementById('round-counter').textContent = '1';
+      winTarget = null;
       document.getElementById('win-modal').classList.remove('visible');
     }
 
