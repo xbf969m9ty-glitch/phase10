@@ -26,23 +26,40 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
 
-    #round-bar {
+    /* Stoppuhr */
+    #stopwatch-bar {
+      display: none;
       background: white;
       border-radius: 12px;
       padding: 12px 16px;
       margin-bottom: 12px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-      display: flex;
       align-items: center;
       justify-content: center;
       gap: 16px;
     }
-
-    #round-bar span {
-      font-size: 17px;
-      font-weight: 600;
+    #stopwatch-bar.visible { display: flex; }
+    #stopwatch-display {
+      font-size: 26px;
+      font-weight: 700;
+      color: #007aff;
+      letter-spacing: 2px;
     }
 
+    /* Runden-Counter */
+    #round-bar {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    #round-bar.visible { display: flex; }
+    #round-bar span { font-size: 17px; font-weight: 600; }
     #round-bar .round-count {
       font-size: 22px;
       font-weight: 700;
@@ -50,7 +67,6 @@
       min-width: 32px;
       text-align: center;
     }
-
     .round-btn {
       background: #007aff;
       color: white;
@@ -64,20 +80,24 @@
     }
     .round-btn:active { background: #005ecb; }
 
-    #add-btn {
+    /* Buttons oben */
+    .top-btn {
       display: block;
       width: 100%;
       padding: 14px;
-      background: #007aff;
-      color: white;
       border: none;
       border-radius: 12px;
       font-size: 17px;
       font-weight: 600;
       cursor: pointer;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
-    #add-btn:active { background: #005ecb; }
+    #add-btn    { background: #007aff; color: white; }
+    #start-btn  { background: #34c759; color: white; }
+    #pause-btn  { background: #ff9500; color: white; display: none; }
+    #cancel-btn { background: #ff3b30; color: white; display: none; }
+
+    .top-btn:active { filter: brightness(0.88); }
 
     .player-card {
       background: white;
@@ -94,10 +114,7 @@
       margin-bottom: 12px;
     }
 
-    .player-name {
-      font-size: 18px;
-      font-weight: 700;
-    }
+    .player-name { font-size: 18px; font-weight: 700; }
 
     .remove-btn {
       background: #ff3b30;
@@ -118,11 +135,7 @@
       margin-bottom: 10px;
     }
 
-    .label {
-      font-size: 14px;
-      color: #666;
-      width: 70px;
-    }
+    .label { font-size: 14px; color: #666; width: 90px; }
 
     .value {
       font-size: 18px;
@@ -198,7 +211,6 @@
     }
 
     .modal-btns { display: flex; gap: 10px; }
-
     .modal-btns button {
       flex: 1;
       padding: 12px;
@@ -238,10 +250,7 @@
       font-size: 15px;
       border-bottom: 1px solid #f2f2f7;
     }
-    .scoreboard tr.winner td {
-      font-weight: 700;
-      color: #007aff;
-    }
+    .scoreboard tr.winner td { font-weight: 700; color: #007aff; }
 
     #win-modal .modal button {
       width: 100%;
@@ -254,11 +263,23 @@
       font-weight: 600;
       cursor: pointer;
     }
+
+    /* Abbrechen-Bestätigung */
+    #cancel-modal .modal p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
 
   <h1>Phase 10 Punkterechner</h1>
+
+  <!-- Stoppuhr -->
+  <div id="stopwatch-bar">
+    <span id="stopwatch-display">00:00</span>
+  </div>
 
   <!-- Runden-Counter -->
   <div id="round-bar">
@@ -267,7 +288,11 @@
     <button class="round-btn" onclick="incrementRound()">+</button>
   </div>
 
-  <button id="add-btn" onclick="openAddModal()">+ Spieler hinzufügen</button>
+  <button id="add-btn"    class="top-btn" onclick="openAddModal()">+ Spieler hinzufügen</button>
+  <button id="start-btn"  class="top-btn" onclick="startGame()">Spiel starten</button>
+  <button id="pause-btn"  class="top-btn" onclick="togglePause()">Pause</button>
+  <button id="cancel-btn" class="top-btn" onclick="openCancelModal()">Spiel abbrechen</button>
+
   <div id="players"></div>
 
   <!-- Add Player Modal -->
@@ -294,6 +319,18 @@
     </div>
   </div>
 
+  <!-- Abbrechen-Bestätigung -->
+  <div class="modal-overlay" id="cancel-modal">
+    <div class="modal">
+      <h2>Spiel abbrechen?</h2>
+      <p>Alle Punkte und der Fortschritt werden zurückgesetzt.</p>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeCancelModal()">Zurück</button>
+        <button class="btn-confirm" style="background:#ff3b30" onclick="cancelGame()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Win Modal -->
   <div class="modal-overlay" id="win-modal">
     <div class="modal">
@@ -310,6 +347,108 @@
     let winTarget = null;
     let editTarget = null;
     let roundCount = 1;
+
+    // Stoppuhr
+    let swSeconds = 0;
+    let swInterval = null;
+    let swRunning = false;
+
+    function formatTime(s) {
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      if (h > 0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      return `00:${String(m).padStart(2,'0')}`;
+    }
+
+    function startGame() {
+      if (Object.keys(players).length === 0) {
+        alert('Bitte zuerst mindestens einen Spieler hinzufügen.');
+        return;
+      }
+      // UI umschalten
+      document.getElementById('add-btn').style.display = 'none';
+      document.getElementById('start-btn').style.display = 'none';
+      document.getElementById('pause-btn').style.display = 'block';
+      document.getElementById('cancel-btn').style.display = 'block';
+      document.getElementById('round-bar').classList.add('visible');
+      document.getElementById('stopwatch-bar').classList.add('visible');
+
+      // Entfernen-Buttons verstecken
+      document.querySelectorAll('.remove-btn').forEach(b => b.style.display = 'none');
+
+      // Stoppuhr starten
+      swSeconds = 0;
+      swRunning = true;
+      swInterval = setInterval(() => {
+        if (swRunning) {
+          swSeconds++;
+          document.getElementById('stopwatch-display').textContent = formatTime(swSeconds);
+        }
+      }, 1000);
+    }
+
+    function togglePause() {
+      const btn = document.getElementById('pause-btn');
+      if (swRunning) {
+        swRunning = false;
+        btn.textContent = 'Weiter';
+        btn.style.background = '#34c759';
+      } else {
+        swRunning = true;
+        btn.textContent = 'Pause';
+        btn.style.background = '#ff9500';
+      }
+    }
+
+    function openCancelModal() {
+      document.getElementById('cancel-modal').classList.add('visible');
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancel-modal').classList.remove('visible');
+    }
+
+    function cancelGame() {
+      closeCancelModal();
+      resetGame();
+    }
+
+    function resetGame() {
+      // Stoppuhr stoppen
+      clearInterval(swInterval);
+      swInterval = null;
+      swRunning = false;
+      swSeconds = 0;
+      document.getElementById('stopwatch-display').textContent = '00:00';
+
+      // Spieler zurücksetzen
+      Object.keys(players).forEach(id => {
+        players[id].phase = 0;
+        players[id].total = 0;
+        document.getElementById('phase-' + id).textContent = '0';
+        document.getElementById('total-' + id).textContent = '0';
+        document.getElementById('round-' + id).value = '0';
+      });
+
+      // Runden-Counter zurücksetzen
+      roundCount = 1;
+      document.getElementById('round-counter').textContent = '1';
+
+      // UI zurücksetzen
+      document.getElementById('add-btn').style.display = 'block';
+      document.getElementById('start-btn').style.display = 'block';
+      document.getElementById('pause-btn').style.display = 'none';
+      document.getElementById('pause-btn').textContent = 'Pause';
+      document.getElementById('pause-btn').style.background = '#ff9500';
+      document.getElementById('cancel-btn').style.display = 'none';
+      document.getElementById('round-bar').classList.remove('visible');
+      document.getElementById('stopwatch-bar').classList.remove('visible');
+
+      // Entfernen-Buttons wieder anzeigen
+      document.querySelectorAll('.remove-btn').forEach(b => b.style.display = 'block');
+
+      winTarget = null;
+    }
 
     function incrementRound() {
       roundCount++;
@@ -384,7 +523,7 @@
           <button class="edit-btn" onclick="openEditModal(${id})">✎</button>
         </div>
         <div class="row">
-          <span class="label">Runde</span>
+          <span class="label">Rundenpunkte</span>
           <input class="round-input" type="number" id="round-${id}" value="0" />
           <button class="plus-btn" onclick="addPoints(${id})">+</button>
         </div>
@@ -397,9 +536,10 @@
       document.getElementById('phase-' + id).textContent = players[id].phase;
       if (players[id].phase >= 10) {
         winTarget = id;
+        clearInterval(swInterval);
+        swRunning = false;
         document.getElementById('win-text').textContent = `Herzlichen Glückwunsch, ${name}!`;
 
-        // Scoreboard aufbauen
         const table = document.getElementById('scoreboard');
         table.innerHTML = `<tr><th>Spieler</th><th>Phase</th><th>Punkte</th></tr>`;
         const sorted = Object.keys(players).sort((a, b) => players[a].total - players[b].total);
@@ -429,19 +569,8 @@
     }
 
     function playAgain() {
-      // Alle Spieler zurücksetzen
-      Object.keys(players).forEach(id => {
-        players[id].phase = 0;
-        players[id].total = 0;
-        document.getElementById('phase-' + id).textContent = '0';
-        document.getElementById('total-' + id).textContent = '0';
-        document.getElementById('round-' + id).value = '0';
-      });
-      // Runden-Counter zurücksetzen
-      roundCount = 1;
-      document.getElementById('round-counter').textContent = '1';
-      winTarget = null;
       document.getElementById('win-modal').classList.remove('visible');
+      resetGame();
     }
 
     function escapeHtml(str) {
