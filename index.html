@@ -7,125 +7,244 @@
   <meta name="apple-mobile-web-app-title" content="Phase 10" />
   <title>Phase 10 Punkterechner</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, sans-serif;
-      background: #f2f2f7;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
       min-height: 100vh;
-      padding: 16px;
+      padding: 16px 14px 32px;
     }
 
-    h1 {
+    /* Header */
+    .app-header {
       text-align: center;
-      background: white;
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      font-size: 20px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      padding: 20px 16px 16px;
+      margin-bottom: 16px;
+    }
+    .app-header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #e94560, #f5a623, #e94560);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+      letter-spacing: -0.5px;
+    }
+    .app-header .subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
     }
 
     /* Stoppuhr */
     #stopwatch-bar {
       display: none;
-      background: white;
-      border-radius: 12px;
-      padding: 12px 16px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 14px 20px;
       margin-bottom: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 12px;
+      backdrop-filter: blur(10px);
     }
     #stopwatch-bar.visible { display: flex; }
+    .sw-icon { font-size: 18px; }
     #stopwatch-display {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
-      color: #007aff;
-      letter-spacing: 2px;
+      color: #e94560;
+      letter-spacing: 3px;
+      font-variant-numeric: tabular-nums;
     }
 
     /* Runden-Counter */
     #round-bar {
       display: none;
-      background: white;
-      border-radius: 12px;
-      padding: 12px 16px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 14px 20px;
       margin-bottom: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 14px;
+      backdrop-filter: blur(10px);
     }
     #round-bar.visible { display: flex; }
-    #round-bar span { font-size: 17px; font-weight: 600; }
+    #round-bar .round-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
     #round-bar .round-count {
-      font-size: 22px;
-      font-weight: 700;
-      color: #007aff;
-      min-width: 32px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #f5a623;
+      min-width: 36px;
       text-align: center;
     }
     .round-btn {
-      background: #007aff;
+      background: linear-gradient(135deg, #f5a623, #e94560);
       color: white;
       border: none;
-      border-radius: 8px;
-      width: 36px;
-      height: 36px;
+      border-radius: 10px;
+      width: 38px;
+      height: 38px;
       font-size: 22px;
       cursor: pointer;
       line-height: 1;
+      font-weight: 700;
+      transition: transform 0.1s, box-shadow 0.1s;
+      box-shadow: 0 4px 12px rgba(233,69,96,0.4);
     }
-    .round-btn:active { background: #005ecb; }
+    .round-btn:active { transform: scale(0.93); box-shadow: none; }
 
     /* Buttons oben */
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .btn-group-single {
+      margin-bottom: 16px;
+    }
     .top-btn {
       display: block;
       width: 100%;
-      padding: 14px;
+      padding: 15px 14px;
       border: none;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 600;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      margin-bottom: 12px;
+      transition: transform 0.12s, box-shadow 0.12s, filter 0.12s;
+      letter-spacing: 0.2px;
     }
-    #add-btn    { background: #007aff; color: white; }
-    #start-btn  { background: #34c759; color: white; }
-    #pause-btn  { background: #ff9500; color: white; display: none; }
-    #cancel-btn { background: #ff3b30; color: white; display: none; }
+    .top-btn:active { transform: scale(0.96); filter: brightness(0.9); }
 
-    .top-btn:active { filter: brightness(0.88); }
+    #add-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 16px rgba(102,126,234,0.4);
+      grid-column: 1 / -1;
+    }
+    #start-btn {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: white;
+      box-shadow: 0 4px 16px rgba(56,239,125,0.35);
+      grid-column: 1 / -1;
+    }
+    #pause-btn {
+      background: linear-gradient(135deg, #f5a623, #f7b733);
+      color: white;
+      box-shadow: 0 4px 16px rgba(245,166,35,0.4);
+      display: none;
+    }
+    #cancel-btn {
+      background: rgba(255,59,48,0.15);
+      color: #ff6b6b;
+      border: 1px solid rgba(255,59,48,0.3);
+      box-shadow: none;
+      display: none;
+    }
+    #cancel-btn:active { background: rgba(255,59,48,0.25); }
 
+    /* Player Cards */
     .player-card {
-      background: white;
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.3s ease;
+      transition: box-shadow 0.2s;
+    }
+    .player-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .player-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
-    .player-name { font-size: 18px; font-weight: 700; }
+    .player-name-wrap { display: flex; align-items: center; gap: 10px; }
+    .player-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e94560, #f5a623);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+    .player-name { font-size: 17px; font-weight: 700; color: white; }
 
     .remove-btn {
-      background: #ff3b30;
-      color: white;
-      border: none;
+      background: rgba(255,59,48,0.15);
+      color: #ff6b6b;
+      border: 1px solid rgba(255,59,48,0.25);
       border-radius: 8px;
       width: 32px;
       height: 32px;
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
-      font-weight: bold;
+      transition: background 0.15s;
+    }
+    .remove-btn:active { background: rgba(255,59,48,0.3); }
+
+    /* Phase dots */
+    .phase-dots {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .phase-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      transition: all 0.25s ease;
+    }
+    .phase-dot.done {
+      background: linear-gradient(135deg, #e94560, #f5a623);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 2px 8px rgba(233,69,96,0.5);
     }
 
     .row {
@@ -135,47 +254,85 @@
       margin-bottom: 10px;
     }
 
-    .label { font-size: 14px; color: #666; width: 90px; }
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      width: 80px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
 
     .value {
-      font-size: 18px;
-      font-weight: 600;
-      min-width: 40px;
+      font-size: 20px;
+      font-weight: 800;
+      min-width: 44px;
       text-align: center;
+      color: white;
     }
 
     .plus-btn {
-      background: #34c759;
+      background: linear-gradient(135deg, #11998e, #38ef7d);
       color: white;
       border: none;
-      border-radius: 8px;
-      width: 36px;
-      height: 36px;
+      border-radius: 10px;
+      width: 38px;
+      height: 38px;
       font-size: 22px;
       cursor: pointer;
-      line-height: 1;
+      font-weight: 700;
+      transition: transform 0.1s, box-shadow 0.1s;
+      box-shadow: 0 3px 10px rgba(56,239,125,0.35);
     }
-    .plus-btn:active { background: #248a3d; }
+    .plus-btn:active { transform: scale(0.9); box-shadow: none; }
 
     .edit-btn {
-      background: #ff9500;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      width: 36px;
-      height: 36px;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      width: 38px;
+      height: 38px;
       font-size: 15px;
       cursor: pointer;
+      transition: background 0.15s;
     }
-    .edit-btn:active { background: #c97700; }
+    .edit-btn:active { background: rgba(255,255,255,0.2); }
 
     .round-input {
-      width: 70px;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      width: 72px;
+      padding: 9px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
       font-size: 16px;
+      font-weight: 600;
       text-align: center;
+      color: white;
+      font-family: inherit;
+    }
+    .round-input:focus {
+      outline: none;
+      border-color: rgba(233,69,96,0.6);
+      background: rgba(255,255,255,0.12);
+    }
+    .round-input::placeholder { color: rgba(255,255,255,0.3); }
+
+    /* Divider */
+    .card-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 12px 0;
+    }
+
+    /* Total score badge */
+    .total-badge {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-left: auto;
     }
 
     /* Modal */
@@ -183,55 +340,95 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.65);
       justify-content: center;
-      align-items: center;
+      align-items: flex-end;
       z-index: 100;
+      backdrop-filter: blur(6px);
     }
     .modal-overlay.visible { display: flex; }
 
     .modal {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      width: 85%;
-      max-width: 340px;
+      background: #1e2340;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px 24px 0 0;
+      padding: 28px 24px 36px;
+      width: 100%;
+      max-width: 480px;
       text-align: center;
+      animation: slideUp 0.28s cubic-bezier(0.34,1.3,0.64,1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
     }
 
-    .modal h2 { font-size: 20px; margin-bottom: 16px; }
+    .modal-handle {
+      width: 40px;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+
+    .modal h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 18px;
+    }
 
     .modal input {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
+      padding: 14px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
       font-size: 16px;
+      font-family: inherit;
+      color: white;
       margin-bottom: 16px;
     }
+    .modal input:focus {
+      outline: none;
+      border-color: rgba(233,69,96,0.6);
+      background: rgba(255,255,255,0.12);
+    }
+    .modal input::placeholder { color: rgba(255,255,255,0.3); }
 
     .modal-btns { display: flex; gap: 10px; }
     .modal-btns button {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
+      font-family: inherit;
+      transition: filter 0.15s, transform 0.1s;
     }
+    .modal-btns button:active { transform: scale(0.97); filter: brightness(0.9); }
 
-    .btn-confirm { background: #007aff; color: white; }
-    .btn-cancel  { background: #e5e5ea; color: #333; }
+    .btn-confirm {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    .btn-cancel {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
 
     /* Win modal */
     #win-modal .modal {
-      max-width: 380px;
-      max-height: 85vh;
+      border-radius: 24px 24px 0 0;
+      max-height: 88vh;
       overflow-y: auto;
     }
-    #win-modal .modal h2 { font-size: 24px; margin-bottom: 8px; }
-    #win-modal .modal .win-sub { font-size: 16px; color: #555; margin-bottom: 16px; }
+    .win-trophy { font-size: 52px; margin-bottom: 8px; }
+    #win-modal .modal h2 { font-size: 26px; color: #f5a623; }
+    #win-modal .modal .win-sub { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 20px; margin-top: 6px; }
 
     .scoreboard {
       width: 100%;
@@ -240,64 +437,93 @@
       text-align: left;
     }
     .scoreboard th {
-      font-size: 13px;
-      color: #888;
-      border-bottom: 1px solid #eee;
-      padding: 6px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 10px;
     }
     .scoreboard td {
-      padding: 8px;
+      padding: 10px;
       font-size: 15px;
-      border-bottom: 1px solid #f2f2f7;
+      color: rgba(255,255,255,0.8);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-weight: 500;
     }
-    .scoreboard tr.winner td { font-weight: 700; color: #007aff; }
+    .scoreboard tr.winner td {
+      font-weight: 800;
+      color: #f5a623;
+    }
+    .scoreboard tr.winner td:first-child::before { content: '🏆 '; }
 
     #win-modal .modal button {
       width: 100%;
-      padding: 14px;
-      background: #007aff;
+      padding: 15px;
+      background: linear-gradient(135deg, #e94560, #f5a623);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 14px;
       font-size: 17px;
-      font-weight: 600;
+      font-weight: 800;
       cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 6px 20px rgba(233,69,96,0.45);
+      transition: filter 0.15s, transform 0.1s;
     }
+    #win-modal .modal button:active { transform: scale(0.97); filter: brightness(0.9); }
 
     /* Abbrechen-Bestätigung */
     #cancel-modal .modal p {
-      font-size: 16px;
-      color: #555;
+      font-size: 15px;
+      color: rgba(255,255,255,0.5);
       margin-bottom: 20px;
+      line-height: 1.5;
     }
+    #cancel-modal .btn-confirm {
+      background: linear-gradient(135deg, #ff3b30, #ff6b6b);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
   </style>
 </head>
 <body>
 
-  <h1>Phase 10 Punkterechner</h1>
+  <div class="app-header">
+    <h1>Phase 10</h1>
+    <div class="subtitle">Punkterechner</div>
+  </div>
 
   <!-- Stoppuhr -->
   <div id="stopwatch-bar">
+    <span class="sw-icon">⏱</span>
     <span id="stopwatch-display">00:00</span>
   </div>
 
   <!-- Runden-Counter -->
   <div id="round-bar">
-    <span>Runde</span>
+    <span class="round-label">Runde</span>
     <span class="round-count" id="round-counter">1</span>
     <button class="round-btn" onclick="incrementRound()">+</button>
   </div>
 
-  <button id="add-btn"    class="top-btn" onclick="openAddModal()">+ Spieler hinzufügen</button>
-  <button id="start-btn"  class="top-btn" onclick="startGame()">Spiel starten</button>
-  <button id="pause-btn"  class="top-btn" onclick="togglePause()">Pause</button>
-  <button id="cancel-btn" class="top-btn" onclick="openCancelModal()">Spiel abbrechen</button>
+  <div class="btn-group">
+    <button id="add-btn"    class="top-btn" onclick="openAddModal()">＋ Spieler hinzufügen</button>
+    <button id="start-btn"  class="top-btn" onclick="startGame()">▶ Spiel starten</button>
+    <button id="pause-btn"  class="top-btn" onclick="togglePause()">⏸ Pause</button>
+    <button id="cancel-btn" class="top-btn" onclick="openCancelModal()">✕ Abbrechen</button>
+  </div>
 
   <div id="players"></div>
 
   <!-- Add Player Modal -->
   <div class="modal-overlay" id="add-modal">
     <div class="modal">
+      <div class="modal-handle"></div>
       <h2>Spieler hinzufügen</h2>
       <input type="text" id="name-input" placeholder="Name eingeben" />
       <div class="modal-btns">
@@ -310,6 +536,7 @@
   <!-- Edit Points Modal -->
   <div class="modal-overlay" id="edit-modal">
     <div class="modal">
+      <div class="modal-handle"></div>
       <h2>Punkte bearbeiten</h2>
       <input type="number" id="edit-input" placeholder="Neuer Punktestand" />
       <div class="modal-btns">
@@ -322,11 +549,12 @@
   <!-- Abbrechen-Bestätigung -->
   <div class="modal-overlay" id="cancel-modal">
     <div class="modal">
+      <div class="modal-handle"></div>
       <h2>Spiel abbrechen?</h2>
       <p>Alle Punkte und der Fortschritt werden zurückgesetzt.</p>
       <div class="modal-btns">
         <button class="btn-cancel" onclick="closeCancelModal()">Zurück</button>
-        <button class="btn-confirm" style="background:#ff3b30" onclick="cancelGame()">Abbrechen</button>
+        <button class="btn-confirm" onclick="cancelGame()">Abbrechen</button>
       </div>
     </div>
   </div>
@@ -334,6 +562,8 @@
   <!-- Win Modal -->
   <div class="modal-overlay" id="win-modal">
     <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="win-trophy">🏆</div>
       <h2>Gewonnen!</h2>
       <p class="win-sub" id="win-text"></p>
       <table class="scoreboard" id="scoreboard"></table>
@@ -391,12 +621,12 @@
       const btn = document.getElementById('pause-btn');
       if (swRunning) {
         swRunning = false;
-        btn.textContent = 'Weiter';
-        btn.style.background = '#34c759';
+        btn.textContent = '▶ Weiter';
+        btn.style.background = 'linear-gradient(135deg, #11998e, #38ef7d)';
       } else {
         swRunning = true;
-        btn.textContent = 'Pause';
-        btn.style.background = '#ff9500';
+        btn.textContent = '⏸ Pause';
+        btn.style.background = 'linear-gradient(135deg, #f5a623, #f7b733)';
       }
     }
 
@@ -428,6 +658,10 @@
         document.getElementById('phase-' + id).textContent = '0';
         document.getElementById('total-' + id).textContent = '0';
         document.getElementById('round-' + id).value = '0';
+        for (let i = 1; i <= 10; i++) {
+          const dot = document.getElementById(`dot-${id}-${i}`);
+          if (dot) dot.classList.remove('done');
+        }
       });
 
       // Runden-Counter zurücksetzen
@@ -504,26 +738,38 @@
       players[id] = { phase: 0, total: 0 };
       playerNames[id] = name;
 
+      const initial = escapeHtml(name.charAt(0).toUpperCase());
+      const safeName = escapeHtml(name);
+      const dots = Array.from({length: 10}, (_, i) =>
+        `<div class="phase-dot" id="dot-${id}-${i+1}">${i+1}</div>`
+      ).join('');
+
       const card = document.createElement('div');
       card.className = 'player-card';
       card.id = 'player-' + id;
       card.innerHTML = `
         <div class="player-header">
-          <span class="player-name">${escapeHtml(name)}</span>
+          <div class="player-name-wrap">
+            <div class="player-avatar">${initial}</div>
+            <span class="player-name">${safeName}</span>
+          </div>
           <button class="remove-btn" onclick="removePlayer(${id})">✕</button>
         </div>
+        <div class="phase-dots" id="dots-${id}">${dots}</div>
+        <div class="card-divider"></div>
         <div class="row">
           <span class="label">Phase</span>
           <span class="value" id="phase-${id}">0</span>
-          <button class="plus-btn" onclick="increasePhase(${id}, '${escapeHtml(name)}')">+</button>
+          <button class="plus-btn" onclick="increasePhase(${id}, '${safeName}')">+</button>
         </div>
         <div class="row">
           <span class="label">Punkte</span>
           <span class="value" id="total-${id}">0</span>
           <button class="edit-btn" onclick="openEditModal(${id})">✎</button>
         </div>
+        <div class="card-divider"></div>
         <div class="row">
-          <span class="label">Rundenpunkte</span>
+          <span class="label">Runde +</span>
           <input class="round-input" type="number" id="round-${id}" value="0" />
           <button class="plus-btn" onclick="addPoints(${id})">+</button>
         </div>
@@ -533,7 +779,11 @@
 
     function increasePhase(id, name) {
       players[id].phase++;
-      document.getElementById('phase-' + id).textContent = players[id].phase;
+      const phase = players[id].phase;
+      document.getElementById('phase-' + id).textContent = phase;
+      // Update dot
+      const dot = document.getElementById(`dot-${id}-${phase}`);
+      if (dot) dot.classList.add('done');
       if (players[id].phase >= 10) {
         winTarget = id;
         clearInterval(swInterval);
