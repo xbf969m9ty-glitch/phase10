@@ -4,615 +4,207 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Phase 10" />
   <title>Phase 10 Punkterechner</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    /* ── Theme variables ─────────────────────────────── */
     :root {
-      --bg-from:        #1a1a2e;
-      --bg-mid:         #16213e;
-      --bg-to:          #0f3460;
-      --accent1:        #e94560;
-      --accent2:        #f5a623;
-      --btn-add-from:   #667eea;
-      --btn-add-to:     #764ba2;
-      --modal-bg:       #1e2340;
-      --focus-border:   rgba(233,69,96,0.6);
-      --shadow1:        rgba(233,69,96,0.4);
-      --shadow2:        rgba(233,69,96,0.45);
-      --shadow3:        rgba(233,69,96,0.5);
-      --shadow-add:     rgba(102,126,234,0.4);
+      --bg-from:#1a1a2e;--bg-mid:#16213e;--bg-to:#0f3460;
+      --accent1:#e94560;--accent2:#f5a623;
+      --btn-add-from:#667eea;--btn-add-to:#764ba2;
+      --modal-bg:#1e2340;--focus-border:rgba(233,69,96,0.6);
+      --shadow1:rgba(233,69,96,0.4);--shadow2:rgba(233,69,96,0.45);
+      --shadow3:rgba(233,69,96,0.5);--shadow-add:rgba(102,126,234,0.4);
     }
-
     body.theme-pink {
-      --bg-from:        #2d1020;
-      --bg-mid:         #3d1535;
-      --bg-to:          #5c1550;
-      --accent1:        #ff4da6;
-      --accent2:        #ffb3d9;
-      --btn-add-from:   #e040a0;
-      --btn-add-to:     #b5179e;
-      --modal-bg:       #2d1020;
-      --focus-border:   rgba(255,77,166,0.6);
-      --shadow1:        rgba(255,77,166,0.4);
-      --shadow2:        rgba(255,77,166,0.45);
-      --shadow3:        rgba(255,77,166,0.5);
-      --shadow-add:     rgba(224,64,160,0.4);
+      --bg-from:#2d1020;--bg-mid:#3d1535;--bg-to:#5c1550;
+      --accent1:#ff4da6;--accent2:#ffb3d9;
+      --btn-add-from:#e040a0;--btn-add-to:#b5179e;
+      --modal-bg:#2d1020;--focus-border:rgba(255,77,166,0.6);
+      --shadow1:rgba(255,77,166,0.4);--shadow2:rgba(255,77,166,0.45);
+      --shadow3:rgba(255,77,166,0.5);--shadow-add:rgba(224,64,160,0.4);
+    }
+    body.theme-ocean {
+      --bg-from:#001e3c;--bg-mid:#0a3d62;--bg-to:#1a6fa8;
+      --accent1:#00b4d8;--accent2:#90e0ef;
+      --btn-add-from:#0096c7;--btn-add-to:#0077b6;
+      --modal-bg:#001e3c;--focus-border:rgba(0,180,216,0.6);
+      --shadow1:rgba(0,180,216,0.4);--shadow2:rgba(0,180,216,0.45);
+      --shadow3:rgba(0,180,216,0.5);--shadow-add:rgba(0,150,199,0.4);
+    }
+    body.theme-forest {
+      --bg-from:#0d2b1a;--bg-mid:#1a4a2e;--bg-to:#2d6a4f;
+      --accent1:#52b788;--accent2:#b7e4c7;
+      --btn-add-from:#40916c;--btn-add-to:#1b4332;
+      --modal-bg:#0d2b1a;--focus-border:rgba(82,183,136,0.6);
+      --shadow1:rgba(82,183,136,0.4);--shadow2:rgba(82,183,136,0.45);
+      --shadow3:rgba(82,183,136,0.5);--shadow-add:rgba(64,145,108,0.4);
+    }
+    body.theme-sunset {
+      --bg-from:#2d0a00;--bg-mid:#7b2d00;--bg-to:#c1440e;
+      --accent1:#ff6b35;--accent2:#ffd166;
+      --btn-add-from:#ef8c3a;--btn-add-to:#c1440e;
+      --modal-bg:#2d0a00;--focus-border:rgba(255,107,53,0.6);
+      --shadow1:rgba(255,107,53,0.4);--shadow2:rgba(255,107,53,0.45);
+      --shadow3:rgba(255,107,53,0.5);--shadow-add:rgba(239,140,58,0.4);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135deg,var(--bg-from) 0%,var(--bg-mid) 50%,var(--bg-to) 100%);min-height:100vh;padding:16px 14px 32px;transition:background 0.4s}
 
-    body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-mid) 50%, var(--bg-to) 100%);
-      min-height: 100vh;
-      padding: 16px 14px 32px;
-      transition: background 0.4s ease;
-    }
+    .app-header{text-align:center;padding:20px 16px 16px;margin-bottom:16px;position:relative}
+    .app-header h1{font-size:26px;font-weight:800;background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent1));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite;letter-spacing:-0.5px}
+    .app-header .subtitle{font-size:13px;color:rgba(255,255,255,0.4);margin-top:4px;font-weight:500}
+    @keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
 
-    /* ── Header ─────────────────────────────────────── */
-    .app-header {
-      text-align: center;
-      padding: 20px 16px 16px;
-      margin-bottom: 16px;
-      position: relative;
-    }
-    .app-header h1 {
-      font-size: 26px;
-      font-weight: 800;
-      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent1));
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s linear infinite;
-      letter-spacing: -0.5px;
-    }
-    .app-header .subtitle {
-      font-size: 13px;
-      color: rgba(255,255,255,0.4);
-      margin-top: 4px;
-      font-weight: 500;
-    }
-    @keyframes shimmer {
-      0%   { background-position: 0% center; }
-      100% { background-position: 200% center; }
-    }
+    .header-btns{position:absolute;top:20px;right:16px;display:flex;gap:8px}
+    .theme-btn,.info-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:12px;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;backdrop-filter:blur(8px)}
+    .theme-btn:active,.info-btn:active{transform:scale(0.93);background:rgba(255,255,255,0.18)}
 
-    /* ── Theme button & picker ──────────────────────── */
-    .theme-btn {
-      position: absolute;
-      top: 20px;
-      right: 16px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 12px;
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, transform 0.1s;
-      backdrop-filter: blur(8px);
-    }
-    .theme-btn:active { transform: scale(0.93); background: rgba(255,255,255,0.18); }
+    .theme-picker{display:none;position:absolute;top:68px;right:14px;background:rgba(30,35,64,0.95);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:14px;z-index:200;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,0.5);flex-direction:column;gap:10px;min-width:160px}
+    .theme-picker.open{display:flex}
+    .theme-picker-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+    .theme-option{display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:10px;transition:background 0.15s;border:1px solid transparent}
+    .theme-option:hover{background:rgba(255,255,255,0.07)}
+    .theme-option.active{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.1)}
+    .theme-swatch{width:28px;height:28px;border-radius:8px;flex-shrink:0}
+    .swatch-dark{background:linear-gradient(135deg,#1a1a2e,#0f3460);border:1px solid rgba(255,255,255,0.15)}
+    .swatch-pink{background:linear-gradient(135deg,#2d1020,#5c1550);border:1px solid rgba(255,77,166,0.3)}
+    .swatch-ocean{background:linear-gradient(135deg,#001e3c,#1a6fa8);border:1px solid rgba(0,180,216,0.3)}
+    .swatch-forest{background:linear-gradient(135deg,#0d2b1a,#2d6a4f);border:1px solid rgba(82,183,136,0.3)}
+    .swatch-sunset{background:linear-gradient(135deg,#2d0a00,#c1440e);border:1px solid rgba(255,107,53,0.3)}
+    .theme-option span{font-size:14px;font-weight:600;color:rgba(255,255,255,0.8)}
 
-    .theme-picker {
-      display: none;
-      position: absolute;
-      top: 68px;
-      right: 14px;
-      background: rgba(30,35,64,0.95);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 16px;
-      padding: 14px;
-      z-index: 200;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      flex-direction: column;
-      gap: 10px;
-      min-width: 150px;
-    }
-    .theme-picker.open { display: flex; }
+    #stopwatch-bar{display:none;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:14px 20px;margin-bottom:12px;align-items:center;justify-content:center;gap:12px;backdrop-filter:blur(10px)}
+    #stopwatch-bar.visible{display:flex}
+    #stopwatch-display{font-size:28px;font-weight:700;color:var(--accent1);letter-spacing:3px;font-variant-numeric:tabular-nums;transition:color 0.4s}
 
-    .theme-picker-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 2px;
-    }
+    #round-bar{display:none;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:14px 20px;margin-bottom:12px;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(10px)}
+    #round-bar.visible{display:flex}
+    #round-bar .round-label{font-size:14px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px}
+    #round-bar .round-count{font-size:26px;font-weight:800;color:var(--accent2);min-width:36px;text-align:center;transition:color 0.4s}
+    .round-btn{background:linear-gradient(135deg,var(--accent2),var(--accent1));color:white;border:none;border-radius:10px;width:38px;height:38px;font-size:22px;cursor:pointer;font-weight:700;transition:transform 0.1s,box-shadow 0.1s;box-shadow:0 4px 12px var(--shadow1)}
+    .round-btn:active{transform:scale(0.93);box-shadow:none}
 
-    .theme-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      padding: 8px 10px;
-      border-radius: 10px;
-      transition: background 0.15s;
-      border: 1px solid transparent;
-    }
-    .theme-option:hover { background: rgba(255,255,255,0.07); }
-    .theme-option.active { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); }
+    .btn-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+    .top-btn{display:block;width:100%;padding:15px 14px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:transform 0.12s,box-shadow 0.12s,filter 0.12s;letter-spacing:0.2px;font-family:inherit}
+    .top-btn:active{transform:scale(0.96);filter:brightness(0.9)}
+    #add-btn{background:linear-gradient(135deg,var(--btn-add-from),var(--btn-add-to));color:white;box-shadow:0 4px 16px var(--shadow-add);grid-column:1/-1;transition:background 0.4s,box-shadow 0.4s}
+    #start-btn{background:linear-gradient(135deg,#11998e,#38ef7d);color:white;box-shadow:0 4px 16px rgba(56,239,125,0.35);grid-column:1/-1}
+    #undo-btn{background:rgba(255,200,50,0.15);color:#ffd166;border:1px solid rgba(255,200,50,0.3);box-shadow:none;display:none;font-family:inherit}
+    #pause-btn{background:linear-gradient(135deg,#f5a623,#f7b733);color:white;box-shadow:0 4px 16px rgba(245,166,35,0.4);display:none}
+    #cancel-btn{background:rgba(255,59,48,0.15);color:#ff6b6b;border:1px solid rgba(255,59,48,0.3);box-shadow:none;display:none}
+    #cancel-btn:active{background:rgba(255,59,48,0.25)}
 
-    .theme-swatch {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      flex-shrink: 0;
-    }
-    .swatch-dark { background: linear-gradient(135deg, #1a1a2e, #0f3460); border: 1px solid rgba(255,255,255,0.15); }
-    .swatch-pink { background: linear-gradient(135deg, #2d1020, #5c1550); border: 1px solid rgba(255,77,166,0.3); }
+    .player-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:18px;margin-bottom:14px;backdrop-filter:blur(10px);animation:slideIn 0.3s ease;transition:box-shadow 0.2s,border-color 0.3s}
+    .player-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .player-card.round-done{border-color:rgba(56,239,125,0.5);box-shadow:0 0 16px rgba(56,239,125,0.15)}
+    @keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-    .theme-option span {
-      font-size: 14px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.8);
-    }
+    .player-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .player-name-wrap{display:flex;align-items:center;gap:10px}
+    .player-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:white;flex-shrink:0}
+    .player-name{font-size:17px;font-weight:700;color:white}
+    .round-check{font-size:16px;margin-left:4px;opacity:0;transition:opacity 0.3s}
+    .round-check.visible{opacity:1}
 
-    /* ── Stoppuhr ───────────────────────────────────── */
-    #stopwatch-bar {
-      display: none;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 14px 20px;
-      margin-bottom: 12px;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      backdrop-filter: blur(10px);
-    }
-    #stopwatch-bar.visible { display: flex; }
-    .sw-icon { font-size: 18px; }
-    #stopwatch-display {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--accent1);
-      letter-spacing: 3px;
-      font-variant-numeric: tabular-nums;
-      transition: color 0.4s;
-    }
+    .remove-btn{background:rgba(255,59,48,0.15);color:#ff6b6b;border:1px solid rgba(255,59,48,0.25);border-radius:8px;width:32px;height:32px;font-size:14px;cursor:pointer;transition:background 0.15s}
+    .remove-btn:active{background:rgba(255,59,48,0.3)}
 
-    /* ── Runden-Counter ─────────────────────────────── */
-    #round-bar {
-      display: none;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 14px 20px;
-      margin-bottom: 12px;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      backdrop-filter: blur(10px);
-    }
-    #round-bar.visible { display: flex; }
-    #round-bar .round-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.6);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    #round-bar .round-count {
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--accent2);
-      min-width: 36px;
-      text-align: center;
-      transition: color 0.4s;
-    }
-    .round-btn {
-      background: linear-gradient(135deg, var(--accent2), var(--accent1));
-      color: white;
-      border: none;
-      border-radius: 10px;
-      width: 38px;
-      height: 38px;
-      font-size: 22px;
-      cursor: pointer;
-      line-height: 1;
-      font-weight: 700;
-      transition: transform 0.1s, box-shadow 0.1s, background 0.4s;
-      box-shadow: 0 4px 12px var(--shadow1);
-    }
-    .round-btn:active { transform: scale(0.93); box-shadow: none; }
+    .phase-dots{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+    .phase-dot{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);background:transparent;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);transition:all 0.25s ease}
+    .phase-dot.done{border-color:transparent;color:white;box-shadow:0 2px 8px var(--shadow3)}
 
-    /* ── Buttons oben ───────────────────────────────── */
-    .btn-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .btn-group-single { margin-bottom: 16px; }
-    .top-btn {
-      display: block;
-      width: 100%;
-      padding: 15px 14px;
-      border: none;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.12s, box-shadow 0.12s, filter 0.12s;
-      letter-spacing: 0.2px;
-    }
-    .top-btn:active { transform: scale(0.96); filter: brightness(0.9); }
+    .row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);width:80px;text-transform:uppercase;letter-spacing:0.8px}
+    .value{font-size:20px;font-weight:800;min-width:44px;text-align:center;color:white}
 
-    #add-btn {
-      background: linear-gradient(135deg, var(--btn-add-from), var(--btn-add-to));
-      color: white;
-      box-shadow: 0 4px 16px var(--shadow-add);
-      grid-column: 1 / -1;
-      transition: background 0.4s, box-shadow 0.4s;
-    }
-    #start-btn {
-      background: linear-gradient(135deg, #11998e, #38ef7d);
-      color: white;
-      box-shadow: 0 4px 16px rgba(56,239,125,0.35);
-      grid-column: 1 / -1;
-    }
-    #pause-btn {
-      background: linear-gradient(135deg, #f5a623, #f7b733);
-      color: white;
-      box-shadow: 0 4px 16px rgba(245,166,35,0.4);
-      display: none;
-    }
-    #cancel-btn {
-      background: rgba(255,59,48,0.15);
-      color: #ff6b6b;
-      border: 1px solid rgba(255,59,48,0.3);
-      box-shadow: none;
-      display: none;
-    }
-    #cancel-btn:active { background: rgba(255,59,48,0.25); }
+    .plus-btn{background:linear-gradient(135deg,#11998e,#38ef7d);color:white;border:none;border-radius:10px;width:38px;height:38px;font-size:22px;cursor:pointer;font-weight:700;transition:transform 0.1s,box-shadow 0.1s;box-shadow:0 3px 10px rgba(56,239,125,0.35)}
+    .plus-btn:active{transform:scale(0.9);box-shadow:none}
+    .minus-btn{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.18);border-radius:10px;width:38px;height:38px;font-size:22px;cursor:pointer;font-weight:700;transition:transform 0.1s,background 0.15s;line-height:1}
+    .minus-btn:active{transform:scale(0.9);background:rgba(255,255,255,0.18)}
+    .edit-btn{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:10px;width:38px;height:38px;font-size:15px;cursor:pointer;transition:background 0.15s}
+    .edit-btn:active{background:rgba(255,255,255,0.2)}
 
-    /* ── Player Cards ───────────────────────────────── */
-    .player-card {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 14px;
-      backdrop-filter: blur(10px);
-      animation: slideIn 0.3s ease;
-      transition: box-shadow 0.2s;
-    }
-    .player-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    .card-divider{height:1px;background:rgba(255,255,255,0.08);margin:12px 0}
+    .total-badge{font-size:11px;color:rgba(255,255,255,0.35);font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-left:auto}
 
-    .player-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
+    /* Card calculator */
+    .card-calc{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px;margin-bottom:10px}
+    .calc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .calc-type-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 6px;cursor:pointer;text-align:center;transition:background 0.15s,border-color 0.15s;font-family:inherit}
+    .calc-type-btn:active{background:rgba(255,255,255,0.15)}
+    .calc-type-btn .pts{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+    .calc-type-btn .lbl{font-size:13px;font-weight:700;color:white}
+    .calc-item{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;background:rgba(255,255,255,0.05);border-radius:8px;padding:6px 10px}
+    .calc-item-lbl{font-size:13px;color:rgba(255,255,255,0.7);font-weight:600}
+    .calc-item-ctrl{display:flex;align-items:center;gap:8px}
+    .calc-mini-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:6px;width:28px;height:28px;font-size:16px;cursor:pointer;color:white;font-weight:700;line-height:1;font-family:inherit}
+    .calc-mini-btn:active{background:rgba(255,255,255,0.2)}
+    .calc-count{font-size:15px;font-weight:700;color:white;min-width:20px;text-align:center}
+    .calc-sum{font-size:14px;font-weight:700;color:var(--accent2);transition:color 0.4s}
+    .calc-add-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--btn-add-from),var(--btn-add-to));color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter 0.15s,transform 0.1s,background 0.4s}
+    .calc-add-btn:active{filter:brightness(0.9);transform:scale(0.98)}
 
-    .player-name-wrap { display: flex; align-items: center; gap: 10px; }
-    .player-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 800;
-      color: white;
-      flex-shrink: 0;
-      transition: background 0.4s;
-    }
-    .player-name { font-size: 17px; font-weight: 700; color: white; }
+    /* History */
+    .history-toggle{background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;text-transform:uppercase;letter-spacing:0.8px;font-family:inherit;display:flex;align-items:center;gap:4px}
+    .history-list{margin-top:8px;max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+    .history-list.open{max-height:300px;overflow-y:auto}
+    .history-item{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:rgba(255,255,255,0.6)}
+    .history-item:last-child{border-bottom:none}
+    .history-edit-btn{background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;padding:2px 6px;border-radius:4px;font-family:inherit}
+    .history-edit-btn:hover{color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.08)}
+    .history-edit-input{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:white;font-size:13px;width:60px;padding:2px 6px;font-family:inherit;text-align:center}
+    .history-edit-input:focus{outline:none;border-color:var(--focus-border)}
 
-    .remove-btn {
-      background: rgba(255,59,48,0.15);
-      color: #ff6b6b;
-      border: 1px solid rgba(255,59,48,0.25);
-      border-radius: 8px;
-      width: 32px;
-      height: 32px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .remove-btn:active { background: rgba(255,59,48,0.3); }
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);justify-content:center;align-items:flex-end;z-index:100;backdrop-filter:blur(6px)}
+    .modal-overlay.visible{display:flex}
+    .modal{background:var(--modal-bg);border:1px solid rgba(255,255,255,0.12);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;text-align:center;animation:slideUp 0.28s cubic-bezier(0.34,1.3,0.64,1);transition:background 0.4s}
+    @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-handle{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 20px}
+    .modal h2{font-size:20px;font-weight:800;color:white;margin-bottom:18px}
+    .modal input{width:100%;padding:14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;font-size:16px;font-family:inherit;color:white;margin-bottom:16px}
+    .modal input:focus{outline:none;border-color:var(--focus-border);background:rgba(255,255,255,0.12)}
+    .modal input::placeholder{color:rgba(255,255,255,0.3)}
+    .modal-btns{display:flex;gap:10px}
+    .modal-btns button{flex:1;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter 0.15s,transform 0.1s}
+    .modal-btns button:active{transform:scale(0.97);filter:brightness(0.9)}
+    .btn-confirm{background:linear-gradient(135deg,var(--btn-add-from),var(--btn-add-to));color:white;transition:background 0.4s}
+    .btn-cancel{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.12)}
 
-    /* ── Phase dots ─────────────────────────────────── */
-    .phase-dots {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .phase-dot {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.2);
-      background: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.35);
-      transition: all 0.25s ease;
-    }
-    .phase-dot.done {
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      border-color: transparent;
-      color: white;
-      box-shadow: 0 2px 8px var(--shadow3);
-      transition: background 0.4s, box-shadow 0.4s;
-    }
+    /* Win modal */
+    #win-modal .modal{border-radius:24px 24px 0 0;max-height:88vh;overflow-y:auto}
+    .win-trophy{font-size:52px;margin-bottom:8px}
+    #win-modal .modal h2{font-size:26px;color:var(--accent2);transition:color 0.4s}
+    #win-modal .modal .win-sub{font-size:15px;color:rgba(255,255,255,0.55);margin-bottom:20px;margin-top:6px}
+    .scoreboard{width:100%;border-collapse:collapse;margin-bottom:20px;text-align:left}
+    .scoreboard th{font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,0.1);padding:8px 10px}
+    .scoreboard td{padding:10px;font-size:15px;color:rgba(255,255,255,0.8);border-bottom:1px solid rgba(255,255,255,0.06);font-weight:500}
+    .scoreboard tr.winner td{font-weight:800;color:var(--accent2);transition:color 0.4s}
+    .scoreboard tr.winner td:first-child::before{content:'🏆 '}
+    .win-stats{background:rgba(255,255,255,0.05);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left}
+    .win-stats-row{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,0.6);padding:4px 0}
+    .win-stats-row span:last-child{font-weight:700;color:rgba(255,255,255,0.9)}
+    #win-modal .modal button.new-game-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--accent1),var(--accent2));color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px var(--shadow2);transition:filter 0.15s,transform 0.1s,background 0.4s}
+    #win-modal .modal button.new-game-btn:active{transform:scale(0.97);filter:brightness(0.9)}
 
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+    /* Cancel modal */
+    #cancel-modal .modal p{font-size:15px;color:rgba(255,255,255,0.5);margin-bottom:20px;line-height:1.5}
+    #cancel-modal .btn-confirm{background:linear-gradient(135deg,#ff3b30,#ff6b6b)}
 
-    .label {
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.4);
-      width: 80px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
+    /* Phases info modal */
+    #info-modal .modal{border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;text-align:left}
+    .phase-info-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+    .phase-info-item:last-child{border-bottom:none}
+    .phase-info-num{font-size:11px;font-weight:700;color:var(--accent1);text-transform:uppercase;letter-spacing:1px;transition:color 0.4s}
+    .phase-info-desc{font-size:14px;color:rgba(255,255,255,0.8);margin-top:2px}
 
-    .value {
-      font-size: 20px;
-      font-weight: 800;
-      min-width: 44px;
-      text-align: center;
-      color: white;
-    }
+    /* Resume modal */
+    #resume-modal .modal p{font-size:15px;color:rgba(255,255,255,0.5);margin-bottom:20px;line-height:1.5}
 
-    .plus-btn {
-      background: linear-gradient(135deg, #11998e, #38ef7d);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      width: 38px;
-      height: 38px;
-      font-size: 22px;
-      cursor: pointer;
-      font-weight: 700;
-      transition: transform 0.1s, box-shadow 0.1s;
-      box-shadow: 0 3px 10px rgba(56,239,125,0.35);
-    }
-    .plus-btn:active { transform: scale(0.9); box-shadow: none; }
-
-    .minus-btn {
-      background: rgba(255,255,255,0.09);
-      color: rgba(255,255,255,0.65);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 10px;
-      width: 38px;
-      height: 38px;
-      font-size: 22px;
-      cursor: pointer;
-      font-weight: 700;
-      transition: transform 0.1s, background 0.15s;
-      line-height: 1;
-    }
-    .minus-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.18); }
-
-    .edit-btn {
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
-      width: 38px;
-      height: 38px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .edit-btn:active { background: rgba(255,255,255,0.2); }
-
-    .round-input {
-      width: 72px;
-      padding: 9px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      text-align: center;
-      color: white;
-      font-family: inherit;
-    }
-    .round-input:focus {
-      outline: none;
-      border-color: var(--focus-border);
-      background: rgba(255,255,255,0.12);
-    }
-    .round-input::placeholder { color: rgba(255,255,255,0.3); }
-
-    /* ── Divider ────────────────────────────────────── */
-    .card-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.08);
-      margin: 12px 0;
-    }
-
-    .total-badge {
-      font-size: 11px;
-      color: rgba(255,255,255,0.35);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-left: auto;
-    }
-
-    /* ── Modal ──────────────────────────────────────── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
-      justify-content: center;
-      align-items: flex-end;
-      z-index: 100;
-      backdrop-filter: blur(6px);
-    }
-    .modal-overlay.visible { display: flex; }
-
-    .modal {
-      background: var(--modal-bg);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 24px 24px 0 0;
-      padding: 28px 24px 36px;
-      width: 100%;
-      max-width: 480px;
-      text-align: center;
-      animation: slideUp 0.28s cubic-bezier(0.34,1.3,0.64,1);
-      transition: background 0.4s;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(60px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal-handle {
-      width: 40px;
-      height: 4px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 2px;
-      margin: 0 auto 20px;
-    }
-
-    .modal h2 {
-      font-size: 20px;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 18px;
-    }
-
-    .modal input {
-      width: 100%;
-      padding: 14px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px;
-      font-size: 16px;
-      font-family: inherit;
-      color: white;
-      margin-bottom: 16px;
-    }
-    .modal input:focus {
-      outline: none;
-      border-color: var(--focus-border);
-      background: rgba(255,255,255,0.12);
-    }
-    .modal input::placeholder { color: rgba(255,255,255,0.3); }
-
-    .modal-btns { display: flex; gap: 10px; }
-    .modal-btns button {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: filter 0.15s, transform 0.1s;
-    }
-    .modal-btns button:active { transform: scale(0.97); filter: brightness(0.9); }
-
-    .btn-confirm {
-      background: linear-gradient(135deg, var(--btn-add-from), var(--btn-add-to));
-      color: white;
-      transition: background 0.4s;
-    }
-    .btn-cancel {
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.6);
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-
-    /* ── Win Modal ──────────────────────────────────── */
-    #win-modal .modal {
-      border-radius: 24px 24px 0 0;
-      max-height: 88vh;
-      overflow-y: auto;
-    }
-    .win-trophy { font-size: 52px; margin-bottom: 8px; }
-    #win-modal .modal h2 { font-size: 26px; color: var(--accent2); transition: color 0.4s; }
-    #win-modal .modal .win-sub { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 20px; margin-top: 6px; }
-
-    .scoreboard {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-      text-align: left;
-    }
-    .scoreboard th {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding: 8px 10px;
-    }
-    .scoreboard td {
-      padding: 10px;
-      font-size: 15px;
-      color: rgba(255,255,255,0.8);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      font-weight: 500;
-    }
-    .scoreboard tr.winner td { font-weight: 800; color: var(--accent2); transition: color 0.4s; }
-    .scoreboard tr.winner td:first-child::before { content: '🏆 '; }
-
-    #win-modal .modal button {
-      width: 100%;
-      padding: 15px;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      font-family: inherit;
-      box-shadow: 0 6px 20px var(--shadow2);
-      transition: filter 0.15s, transform 0.1s, background 0.4s;
-    }
-    #win-modal .modal button:active { transform: scale(0.97); filter: brightness(0.9); }
-
-    /* ── Abbrechen-Bestätigung ──────────────────────── */
-    #cancel-modal .modal p {
-      font-size: 15px;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    #cancel-modal .btn-confirm {
-      background: linear-gradient(135deg, #ff3b30, #ff6b6b);
-    }
-
-    /* ── Scrollbar ──────────────────────────────────── */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px}
   </style>
 </head>
 <body>
@@ -620,27 +212,25 @@
   <div class="app-header">
     <h1>Phase 10</h1>
     <div class="subtitle">Punkterechner</div>
-    <button class="theme-btn" onclick="toggleThemePicker()" title="Design ändern">🎨</button>
+    <div class="header-btns">
+      <button class="info-btn" onclick="openInfoModal()" title="Phasen-Info">ℹ️</button>
+      <button class="theme-btn" onclick="toggleThemePicker()" title="Design">🎨</button>
+    </div>
     <div class="theme-picker" id="theme-picker">
       <div class="theme-picker-title">Design</div>
-      <div class="theme-option active" id="opt-dark" onclick="setTheme('dark')">
-        <div class="theme-swatch swatch-dark"></div>
-        <span>Nacht</span>
-      </div>
-      <div class="theme-option" id="opt-pink" onclick="setTheme('pink')">
-        <div class="theme-swatch swatch-pink"></div>
-        <span>Pink</span>
-      </div>
+      <div class="theme-option active" id="opt-dark" onclick="setTheme('dark')"><div class="theme-swatch swatch-dark"></div><span>Nacht</span></div>
+      <div class="theme-option" id="opt-pink" onclick="setTheme('pink')"><div class="theme-swatch swatch-pink"></div><span>Pink</span></div>
+      <div class="theme-option" id="opt-ocean" onclick="setTheme('ocean')"><div class="theme-swatch swatch-ocean"></div><span>Ocean</span></div>
+      <div class="theme-option" id="opt-forest" onclick="setTheme('forest')"><div class="theme-swatch swatch-forest"></div><span>Forest</span></div>
+      <div class="theme-option" id="opt-sunset" onclick="setTheme('sunset')"><div class="theme-swatch swatch-sunset"></div><span>Sunset</span></div>
     </div>
   </div>
 
-  <!-- Stoppuhr -->
   <div id="stopwatch-bar">
-    <span class="sw-icon">⏱</span>
+    <span>⏱</span>
     <span id="stopwatch-display">00:00</span>
   </div>
 
-  <!-- Runden-Counter -->
   <div id="round-bar">
     <span class="round-label">Runde</span>
     <span class="round-count" id="round-counter">1</span>
@@ -650,6 +240,7 @@
   <div class="btn-group">
     <button id="add-btn"    class="top-btn" onclick="openAddModal()">＋ Spieler hinzufügen</button>
     <button id="start-btn"  class="top-btn" onclick="startGame()">▶ Spiel starten</button>
+    <button id="undo-btn"   class="top-btn" onclick="undoRound()">↩ Runde rückgängig</button>
     <button id="pause-btn"  class="top-btn" onclick="togglePause()">⏸ Pause</button>
     <button id="cancel-btn" class="top-btn" onclick="openCancelModal()">✕ Abbrechen</button>
   </div>
@@ -682,7 +273,7 @@
     </div>
   </div>
 
-  <!-- Abbrechen-Bestätigung -->
+  <!-- Cancel Modal -->
   <div class="modal-overlay" id="cancel-modal">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -702,296 +293,553 @@
       <div class="win-trophy">🏆</div>
       <h2>Gewonnen!</h2>
       <p class="win-sub" id="win-text"></p>
+      <div class="win-stats" id="win-stats"></div>
       <table class="scoreboard" id="scoreboard"></table>
-      <button onclick="playAgain()">Nochmal spielen</button>
+      <button class="new-game-btn" onclick="playAgain()">Nochmal spielen</button>
+    </div>
+  </div>
+
+  <!-- Phases Info Modal -->
+  <div class="modal-overlay" id="info-modal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2>Die 10 Phasen</h2>
+      <div id="phases-list"></div>
+      <div class="modal-btns" style="margin-top:16px">
+        <button class="btn-cancel" onclick="closeInfoModal()">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resume Modal -->
+  <div class="modal-overlay" id="resume-modal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2>Spiel fortsetzen?</h2>
+      <p>Ein gespeicherter Spielstand wurde gefunden.</p>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="discardSave()">Nein</button>
+        <button class="btn-confirm" onclick="resumeSave()">Ja, fortsetzen</button>
+      </div>
     </div>
   </div>
 
   <script>
-    let players = {};
+    // ── State ──────────────────────────────────────────────
+    let players = {};        // id -> {phase, total, history:[{pts,round}], calcItems:{}}
     let playerNames = {};
+    let playerOrder = [];    // insertion order
     let winTarget = null;
     let editTarget = null;
     let roundCount = 1;
-
-    // Stoppuhr
+    let gameStarted = false;
+    let gameStartTime = null;
     let swSeconds = 0;
     let swInterval = null;
     let swRunning = false;
-
-    // ── Theme ──────────────────────────────────────────
     let currentTheme = 'dark';
+    let undoStack = [];      // [{id->pts added, round}]
+    let roundEnteredIds = new Set();
 
+    const PLAYER_COLORS = [
+      'linear-gradient(135deg,#e94560,#f5a623)',
+      'linear-gradient(135deg,#667eea,#764ba2)',
+      'linear-gradient(135deg,#11998e,#38ef7d)',
+      'linear-gradient(135deg,#f093fb,#f5576c)',
+      'linear-gradient(135deg,#4facfe,#00f2fe)',
+      'linear-gradient(135deg,#fa709a,#fee140)',
+    ];
+
+    const PHASES = [
+      'Phase 1: 2 Drillinge',
+      'Phase 2: 1 Drilling + 1 Viererfolge',
+      'Phase 3: 1 Vierling + 1 Viererfolge',
+      'Phase 4: 1 Viererfolge + 1 Vierling',
+      'Phase 5: 1 Achterfolge',
+      'Phase 6: 1 Neuerfolge',
+      'Phase 7: 2 Vierlinge',
+      'Phase 8: 7 Karten einer Farbe',
+      'Phase 9: 1 Fünfling + 1 Zwilling',
+      'Phase 10: 1 Fünfling + 1 Drilling',
+    ];
+
+    const CARD_TYPES = [
+      {key:'low',  label:'1–9',       pts:5},
+      {key:'high', label:'10–12',     pts:10},
+      {key:'skip', label:'Aussetzen', pts:15},
+      {key:'wild', label:'Joker',     pts:20},
+    ];
+
+    // ── localStorage ───────────────────────────────────────
+    function saveState() {
+      const state = {players, playerNames, playerOrder, roundCount, swSeconds, currentTheme, gameStarted, gameStartTime};
+      localStorage.setItem('phase10_state', JSON.stringify(state));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem('phase10_state');
+      if (!raw) return false;
+      try {
+        const s = JSON.parse(raw);
+        if (!s.players || Object.keys(s.players).length === 0) return false;
+        return s;
+      } catch { return false; }
+    }
+
+    function discardSave() {
+      localStorage.removeItem('phase10_state');
+      document.getElementById('resume-modal').classList.remove('visible');
+    }
+
+    function resumeSave() {
+      document.getElementById('resume-modal').classList.remove('visible');
+      const s = loadState();
+      players = s.players;
+      playerNames = s.playerNames;
+      playerOrder = s.playerOrder || Object.keys(players).map(Number);
+      roundCount = s.roundCount || 1;
+      swSeconds = s.swSeconds || 0;
+      currentTheme = s.currentTheme || 'dark';
+      gameStarted = s.gameStarted || false;
+      gameStartTime = s.gameStartTime || null;
+      applyTheme(currentTheme);
+      rebuildAllCards();
+      if (gameStarted) {
+        showGameUI();
+        document.getElementById('stopwatch-display').textContent = formatTime(swSeconds);
+        document.getElementById('round-counter').textContent = roundCount;
+        swRunning = true;
+        swInterval = setInterval(() => { if(swRunning){swSeconds++;document.getElementById('stopwatch-display').textContent=formatTime(swSeconds);saveState();} }, 1000);
+      }
+    }
+
+    // ── Init ───────────────────────────────────────────────
+    window.addEventListener('load', () => {
+      buildPhasesInfo();
+      const saved = loadState();
+      if (saved) {
+        document.getElementById('resume-modal').classList.add('visible');
+      }
+    });
+
+    function buildPhasesInfo() {
+      const el = document.getElementById('phases-list');
+      el.innerHTML = PHASES.map((p,i) => `
+        <div class="phase-info-item">
+          <div class="phase-info-num">Phase ${i+1}</div>
+          <div class="phase-info-desc">${p.split(': ')[1]}</div>
+        </div>`).join('');
+    }
+
+    // ── Theme ──────────────────────────────────────────────
     function toggleThemePicker() {
       document.getElementById('theme-picker').classList.toggle('open');
     }
 
+    function applyTheme(theme) {
+      ['dark','pink','ocean','forest','sunset'].forEach(t => {
+        document.body.classList.toggle('theme-'+t, t !== 'dark' && t === theme);
+        document.getElementById('opt-'+t).classList.toggle('active', t === theme);
+      });
+    }
+
     function setTheme(theme) {
       currentTheme = theme;
-      document.body.classList.toggle('theme-pink', theme === 'pink');
-      document.getElementById('opt-dark').classList.toggle('active', theme === 'dark');
-      document.getElementById('opt-pink').classList.toggle('active', theme === 'pink');
+      applyTheme(theme);
       document.getElementById('theme-picker').classList.remove('open');
+      saveState();
     }
 
-    // Close picker when clicking outside
     document.addEventListener('click', e => {
       const picker = document.getElementById('theme-picker');
-      if (!picker.contains(e.target) && !e.target.closest('.theme-btn')) {
-        picker.classList.remove('open');
-      }
+      if (!picker.contains(e.target) && !e.target.closest('.theme-btn')) picker.classList.remove('open');
     });
 
-    // ── Stopwatch ──────────────────────────────────────
+    // ── Time ───────────────────────────────────────────────
     function formatTime(s) {
-      const h = Math.floor(s / 3600);
-      const m = Math.floor((s % 3600) / 60);
+      const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
       if (h > 0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-      return `00:${String(m).padStart(2,'0')}`;
+      return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
     }
 
-    function startGame() {
-      if (Object.keys(players).length === 0) {
-        alert('Bitte zuerst mindestens einen Spieler hinzufügen.');
-        return;
-      }
+    // ── Game flow ──────────────────────────────────────────
+    function showGameUI() {
       document.getElementById('add-btn').style.display = 'none';
       document.getElementById('start-btn').style.display = 'none';
+      document.getElementById('undo-btn').style.display = 'block';
       document.getElementById('pause-btn').style.display = 'block';
       document.getElementById('cancel-btn').style.display = 'block';
       document.getElementById('round-bar').classList.add('visible');
       document.getElementById('stopwatch-bar').classList.add('visible');
+      document.querySelectorAll('.remove-btn').forEach(b => b.style.display='none');
+    }
 
-      document.querySelectorAll('.remove-btn').forEach(b => b.style.display = 'none');
-
+    function startGame() {
+      if (Object.keys(players).length === 0) { alert('Bitte zuerst mindestens einen Spieler hinzufügen.'); return; }
+      gameStarted = true;
+      gameStartTime = Date.now();
+      showGameUI();
       swSeconds = 0;
       swRunning = true;
-      swInterval = setInterval(() => {
-        if (swRunning) {
-          swSeconds++;
-          document.getElementById('stopwatch-display').textContent = formatTime(swSeconds);
-        }
-      }, 1000);
+      swInterval = setInterval(() => { if(swRunning){swSeconds++;document.getElementById('stopwatch-display').textContent=formatTime(swSeconds);saveState();} }, 1000);
+      saveState();
     }
 
     function togglePause() {
       const btn = document.getElementById('pause-btn');
       if (swRunning) {
-        swRunning = false;
-        btn.textContent = '▶ Weiter';
-        btn.style.background = 'linear-gradient(135deg, #11998e, #38ef7d)';
+        swRunning = false; btn.textContent = '▶ Weiter';
+        btn.style.background = 'linear-gradient(135deg,#11998e,#38ef7d)';
       } else {
-        swRunning = true;
-        btn.textContent = '⏸ Pause';
-        btn.style.background = 'linear-gradient(135deg, #f5a623, #f7b733)';
+        swRunning = true; btn.textContent = '⏸ Pause';
+        btn.style.background = 'linear-gradient(135deg,#f5a623,#f7b733)';
       }
     }
 
-    function openCancelModal() {
-      document.getElementById('cancel-modal').classList.add('visible');
-    }
+    function openCancelModal()  { document.getElementById('cancel-modal').classList.add('visible'); }
+    function closeCancelModal() { document.getElementById('cancel-modal').classList.remove('visible'); }
+    function openInfoModal()    { document.getElementById('info-modal').classList.add('visible'); }
+    function closeInfoModal()   { document.getElementById('info-modal').classList.remove('visible'); }
 
-    function closeCancelModal() {
-      document.getElementById('cancel-modal').classList.remove('visible');
-    }
-
-    function cancelGame() {
-      closeCancelModal();
-      resetGame();
-    }
+    function cancelGame() { closeCancelModal(); resetGame(); }
 
     function resetGame() {
-      clearInterval(swInterval);
-      swInterval = null;
-      swRunning = false;
-      swSeconds = 0;
+      clearInterval(swInterval); swInterval = null; swRunning = false; swSeconds = 0;
       document.getElementById('stopwatch-display').textContent = '00:00';
-
       Object.keys(players).forEach(id => {
-        players[id].phase = 0;
-        players[id].total = 0;
-        document.getElementById('phase-' + id).textContent = '0';
-        document.getElementById('total-' + id).textContent = '0';
-        document.getElementById('round-' + id).value = '0';
-        for (let i = 1; i <= 10; i++) {
-          const dot = document.getElementById(`dot-${id}-${i}`);
-          if (dot) dot.classList.remove('done');
-        }
+        players[id].phase = 0; players[id].total = 0; players[id].history = [];
+        players[id].calcItems = {};
+        renderCard(id);
       });
-
       roundCount = 1;
       document.getElementById('round-counter').textContent = '1';
-
       document.getElementById('add-btn').style.display = 'block';
       document.getElementById('start-btn').style.display = 'block';
+      document.getElementById('undo-btn').style.display = 'none';
       document.getElementById('pause-btn').style.display = 'none';
       document.getElementById('pause-btn').textContent = '⏸ Pause';
-      document.getElementById('pause-btn').style.background = 'linear-gradient(135deg, #f5a623, #f7b733)';
+      document.getElementById('pause-btn').style.background = 'linear-gradient(135deg,#f5a623,#f7b733)';
       document.getElementById('cancel-btn').style.display = 'none';
       document.getElementById('round-bar').classList.remove('visible');
       document.getElementById('stopwatch-bar').classList.remove('visible');
-
-      document.querySelectorAll('.remove-btn').forEach(b => b.style.display = 'block');
-
-      winTarget = null;
+      document.querySelectorAll('.remove-btn').forEach(b => b.style.display='block');
+      winTarget = null; undoStack = []; roundEnteredIds.clear(); gameStarted = false;
+      localStorage.removeItem('phase10_state');
     }
 
     function incrementRound() {
       roundCount++;
       document.getElementById('round-counter').textContent = roundCount;
+      roundEnteredIds.clear();
+      Object.keys(players).forEach(id => {
+        const card = document.getElementById('player-'+id);
+        if (card) card.classList.remove('round-done');
+        const chk = document.getElementById('check-'+id);
+        if (chk) { chk.textContent = ''; chk.classList.remove('visible'); }
+      });
+      saveState();
     }
 
-    // ── Add Player ─────────────────────────────────────
+    // ── Undo ───────────────────────────────────────────────
+    function undoRound() {
+      if (undoStack.length === 0) return;
+      const snapshot = undoStack.pop();
+      Object.keys(snapshot).forEach(id => {
+        if (!players[id]) return;
+        players[id].total -= snapshot[id];
+        players[id].history.pop();
+        renderCard(id);
+      });
+      if (roundCount > 1) { roundCount--; document.getElementById('round-counter').textContent = roundCount; }
+      roundEnteredIds.clear();
+      Object.keys(players).forEach(id => {
+        const card = document.getElementById('player-'+id);
+        if (card) card.classList.remove('round-done');
+        const chk = document.getElementById('check-'+id);
+        if (chk) { chk.textContent = ''; chk.classList.remove('visible'); }
+      });
+      sortCards();
+      saveState();
+    }
+
+    // ── Add Player ─────────────────────────────────────────
     function openAddModal() {
       document.getElementById('name-input').value = '';
       document.getElementById('add-modal').classList.add('visible');
       setTimeout(() => document.getElementById('name-input').focus(), 100);
     }
+    function closeAddModal() { document.getElementById('add-modal').classList.remove('visible'); }
+    document.getElementById('name-input').addEventListener('keydown', e => { if(e.key==='Enter') addPlayer(); });
 
-    function closeAddModal() {
-      document.getElementById('add-modal').classList.remove('visible');
+    function addPlayer() {
+      const name = document.getElementById('name-input').value.trim();
+      if (!name) return;
+      closeAddModal();
+      const id = Date.now();
+      const colorIdx = playerOrder.length % PLAYER_COLORS.length;
+      players[id] = { phase:0, total:0, history:[], calcItems:{low:0,high:0,skip:0,wild:0}, color: PLAYER_COLORS[colorIdx] };
+      playerNames[id] = name;
+      playerOrder.push(id);
+      createCardElement(id);
+      sortCards();
+      saveState();
     }
 
-    document.getElementById('name-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addPlayer();
-    });
+    function removePlayer(id) {
+      document.getElementById('player-'+id).remove();
+      delete players[id]; delete playerNames[id];
+      playerOrder = playerOrder.filter(x => x != id);
+      saveState();
+    }
 
-    // ── Edit Points ────────────────────────────────────
+    // ── Card rendering ─────────────────────────────────────
+    function rebuildAllCards() {
+      document.getElementById('players').innerHTML = '';
+      playerOrder.forEach(id => createCardElement(id));
+      sortCards();
+    }
+
+    function createCardElement(id) {
+      const card = document.createElement('div');
+      card.className = 'player-card';
+      card.id = 'player-' + id;
+      document.getElementById('players').appendChild(card);
+      renderCard(id);
+    }
+
+    function renderCard(id) {
+      const p = players[id];
+      const name = escapeHtml(playerNames[id]);
+      const initial = name.charAt(0).toUpperCase();
+      const dots = Array.from({length:10},(_,i) =>
+        `<div class="phase-dot${p.phase>i?' done':''}" id="dot-${id}-${i+1}">${i+1}</div>`
+      ).join('');
+
+      const calcItemsHtml = CARD_TYPES.map(t => `
+        <div class="calc-item">
+          <span class="calc-item-lbl">${t.label} (${t.pts}P)</span>
+          <div class="calc-item-ctrl">
+            <button class="calc-mini-btn" onclick="calcChange(${id},'${t.key}',-1)">−</button>
+            <span class="calc-count" id="calc-${id}-${t.key}">${p.calcItems[t.key]||0}</span>
+            <button class="calc-mini-btn" onclick="calcChange(${id},'${t.key}',1)">+</button>
+          </div>
+        </div>`).join('');
+
+      const historyHtml = p.history.length === 0
+        ? '<div style="font-size:13px;color:rgba(255,255,255,0.3);padding:6px 0">Noch keine Einträge</div>'
+        : p.history.map((h,i) => `
+          <div class="history-item" id="hist-${id}-${i}">
+            <span>Runde ${h.round}: <strong>${h.pts>=0?'+':''}${h.pts}</strong></span>
+            <button class="history-edit-btn" onclick="editHistoryItem(${id},${i})">✎</button>
+          </div>`).join('');
+
+      const calcSum = calcCurrentSum(id);
+      const isDone = roundEnteredIds.has(String(id));
+
+      const card = document.getElementById('player-'+id);
+      card.innerHTML = `
+        <div class="player-header">
+          <div class="player-name-wrap">
+            <div class="player-avatar" style="background:${p.color}">${initial}</div>
+            <span class="player-name">${name}</span>
+            <span class="round-check${isDone?' visible':''}" id="check-${id}">✅</span>
+          </div>
+          <button class="remove-btn" onclick="removePlayer(${id})" style="${gameStarted?'display:none':''}">✕</button>
+        </div>
+        <div class="phase-dots">${dots}</div>
+        <div class="card-divider"></div>
+        <div class="row">
+          <span class="label">Phase</span>
+          <button class="minus-btn" onclick="decreasePhase(${id})">−</button>
+          <span class="value" id="phase-${id}">${p.phase}</span>
+          <button class="plus-btn" onclick="increasePhase(${id})">+</button>
+        </div>
+        <div class="row">
+          <span class="label">Punkte</span>
+          <span class="value" id="total-${id}">${p.total}</span>
+          <button class="edit-btn" onclick="openEditModal(${id})">✎</button>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-calc">
+          <div class="calc-btns">
+            ${CARD_TYPES.map(t=>`<div class="calc-type-btn" onclick="calcChange(${id},'${t.key}',1)"><div class="lbl">${t.label}</div><div class="pts">+${t.pts}P</div></div>`).join('')}
+          </div>
+          ${calcItemsHtml}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px">
+            <span style="font-size:13px;color:rgba(255,255,255,0.5);font-weight:600">Summe:</span>
+            <span class="calc-sum" id="calcsum-${id}">${calcSum}P</span>
+          </div>
+          <button class="calc-add-btn" onclick="addPointsFromCalc(${id})">Hinzufügen (${calcSum}P)</button>
+        </div>
+        <div style="margin-top:4px">
+          <button class="history-toggle" onclick="toggleHistory(${id})">
+            <span id="hist-arrow-${id}">▶</span> Rundenhistorie (${p.history.length})
+          </button>
+          <div class="history-list" id="history-${id}">${historyHtml}</div>
+        </div>`;
+
+      if (isDone) card.classList.add('round-done'); else card.classList.remove('round-done');
+    }
+
+    function calcCurrentSum(id) {
+      const ci = players[id].calcItems || {};
+      return CARD_TYPES.reduce((s,t) => s + (ci[t.key]||0)*t.pts, 0);
+    }
+
+    function calcChange(id, key, delta) {
+      if (!players[id].calcItems) players[id].calcItems = {};
+      players[id].calcItems[key] = Math.max(0, (players[id].calcItems[key]||0) + delta);
+      const sum = calcCurrentSum(id);
+      const countEl = document.getElementById(`calc-${id}-${key}`);
+      if (countEl) countEl.textContent = players[id].calcItems[key];
+      const sumEl = document.getElementById(`calcsum-${id}`);
+      if (sumEl) sumEl.textContent = sum+'P';
+      const addBtn = document.querySelector(`#player-${id} .calc-add-btn`);
+      if (addBtn) addBtn.textContent = `Hinzufügen (${sum}P)`;
+      saveState();
+    }
+
+    function addPointsFromCalc(id) {
+      const sum = calcCurrentSum(id);
+      players[id].total += sum;
+      players[id].history.push({pts: sum, round: roundCount});
+      players[id].calcItems = {low:0,high:0,skip:0,wild:0};
+
+      // track round entries for auto-advance
+      roundEnteredIds.add(String(id));
+      const snapshot = undoStack[undoStack.length-1];
+      if (snapshot && !snapshot._roundDone) { snapshot[id] = (snapshot[id]||0) + sum; }
+      else { const s = {[id]: sum}; undoStack.push(s); }
+
+      renderCard(id);
+      sortCards();
+
+      // check all players entered
+      const allIds = Object.keys(players);
+      if (allIds.every(pid => roundEnteredIds.has(pid))) {
+        setTimeout(() => { if(confirm(`Alle Spieler eingetragen! Runde ${roundCount+1} beginnen?`)) incrementRound(); }, 200);
+      }
+      saveState();
+    }
+
+    function toggleHistory(id) {
+      const list = document.getElementById('history-'+id);
+      const arrow = document.getElementById('hist-arrow-'+id);
+      list.classList.toggle('open');
+      arrow.textContent = list.classList.contains('open') ? '▼' : '▶';
+    }
+
+    function editHistoryItem(id, idx) {
+      const item = document.getElementById(`hist-${id}-${idx}`);
+      if (!item) return;
+      const cur = players[id].history[idx].pts;
+      item.innerHTML = `
+        <span>Runde ${players[id].history[idx].round}:</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input class="history-edit-input" id="hedit-${id}-${idx}" type="number" value="${cur}" />
+          <button class="history-edit-btn" onclick="saveHistoryItem(${id},${idx})">✓</button>
+        </div>`;
+      document.getElementById(`hedit-${id}-${idx}`).addEventListener('keydown', e => { if(e.key==='Enter') saveHistoryItem(id,idx); });
+    }
+
+    function saveHistoryItem(id, idx) {
+      const input = document.getElementById(`hedit-${id}-${idx}`);
+      if (!input) return;
+      const newVal = parseInt(input.value);
+      if (isNaN(newVal)) return;
+      const diff = newVal - players[id].history[idx].pts;
+      players[id].history[idx].pts = newVal;
+      players[id].total += diff;
+      renderCard(id);
+      sortCards();
+      saveState();
+    }
+
+    // ── Sorting ────────────────────────────────────────────
+    function sortCards() {
+      const container = document.getElementById('players');
+      const ids = Object.keys(players);
+      ids.sort((a,b) => {
+        const pd = players[b].phase - players[a].phase;
+        if (pd !== 0) return pd;
+        return players[a].total - players[b].total;
+      });
+      ids.forEach(id => container.appendChild(document.getElementById('player-'+id)));
+    }
+
+    // ── Phase ──────────────────────────────────────────────
+    function increasePhase(id) {
+      if (players[id].phase >= 10) return;
+      players[id].phase++;
+      document.getElementById('phase-'+id).textContent = players[id].phase;
+      const dot = document.getElementById(`dot-${id}-${players[id].phase}`);
+      if (dot) dot.classList.add('done');
+      if (players[id].phase >= 10) showWinModal(id);
+      sortCards(); saveState();
+    }
+
+    function decreasePhase(id) {
+      if (players[id].phase <= 0) return;
+      const dot = document.getElementById(`dot-${id}-${players[id].phase}`);
+      if (dot) dot.classList.remove('done');
+      players[id].phase--;
+      document.getElementById('phase-'+id).textContent = players[id].phase;
+      sortCards(); saveState();
+    }
+
+    // ── Win ────────────────────────────────────────────────
+    function showWinModal(id) {
+      clearInterval(swInterval); swRunning = false;
+      const name = escapeHtml(playerNames[id]);
+      document.getElementById('win-text').textContent = `Herzlichen Glückwunsch, ${name}!`;
+
+      // Stats
+      const totalSec = swSeconds;
+      const statsEl = document.getElementById('win-stats');
+      const pids = Object.keys(players);
+      let statsHtml = `<div class="win-stats-row"><span>Spielzeit</span><span>${formatTime(totalSec)}</span></div>
+        <div class="win-stats-row"><span>Runden</span><span>${roundCount}</span></div>`;
+      pids.forEach(pid => {
+        const hist = players[pid].history.map(h=>h.pts);
+        if (hist.length === 0) return;
+        const min = Math.min(...hist), max = Math.max(...hist);
+        const avg = Math.round(hist.reduce((a,b)=>a+b,0)/hist.length);
+        statsHtml += `<div class="win-stats-row"><span>${escapeHtml(playerNames[pid])}</span><span>Ø${avg} | ↓${min} | ↑${max}</span></div>`;
+      });
+      statsEl.innerHTML = statsHtml;
+
+      const table = document.getElementById('scoreboard');
+      table.innerHTML = `<tr><th>Spieler</th><th>Phase</th><th>Punkte</th></tr>`;
+      const sorted = pids.slice().sort((a,b) => players[a].total - players[b].total);
+      sorted.forEach(pid => {
+        const tr = document.createElement('tr');
+        if (parseInt(pid) === id) tr.className = 'winner';
+        tr.innerHTML = `<td>${escapeHtml(playerNames[pid])}</td><td>${players[pid].phase}</td><td>${players[pid].total}</td>`;
+        table.appendChild(tr);
+      });
+      document.getElementById('win-modal').classList.add('visible');
+    }
+
+    function playAgain() { document.getElementById('win-modal').classList.remove('visible'); resetGame(); }
+
+    // ── Edit Points ────────────────────────────────────────
     function openEditModal(id) {
       editTarget = id;
       document.getElementById('edit-input').value = players[id].total;
       document.getElementById('edit-modal').classList.add('visible');
       setTimeout(() => document.getElementById('edit-input').focus(), 100);
     }
-
-    function closeEditModal() {
-      document.getElementById('edit-modal').classList.remove('visible');
-      editTarget = null;
-    }
-
+    function closeEditModal() { document.getElementById('edit-modal').classList.remove('visible'); editTarget = null; }
     function saveEdit() {
       if (editTarget === null) return;
       const val = parseInt(document.getElementById('edit-input').value);
-      if (!isNaN(val)) {
-        players[editTarget].total = val;
-        document.getElementById('total-' + editTarget).textContent = val;
-      }
-      closeEditModal();
+      if (!isNaN(val)) { players[editTarget].total = val; document.getElementById('total-'+editTarget).textContent = val; }
+      closeEditModal(); saveState();
     }
-
-    document.getElementById('edit-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') saveEdit();
-    });
-
-    // ── Add Player ─────────────────────────────────────
-    function addPlayer() {
-      const name = document.getElementById('name-input').value.trim();
-      if (!name) return;
-      closeAddModal();
-
-      const id = Date.now();
-      players[id] = { phase: 0, total: 0 };
-      playerNames[id] = name;
-
-      const initial = escapeHtml(name.charAt(0).toUpperCase());
-      const safeName = escapeHtml(name);
-      const dots = Array.from({length: 10}, (_, i) =>
-        `<div class="phase-dot" id="dot-${id}-${i+1}">${i+1}</div>`
-      ).join('');
-
-      const card = document.createElement('div');
-      card.className = 'player-card';
-      card.id = 'player-' + id;
-      card.innerHTML = `
-        <div class="player-header">
-          <div class="player-name-wrap">
-            <div class="player-avatar">${initial}</div>
-            <span class="player-name">${safeName}</span>
-          </div>
-          <button class="remove-btn" onclick="removePlayer(${id})">✕</button>
-        </div>
-        <div class="phase-dots" id="dots-${id}">${dots}</div>
-        <div class="card-divider"></div>
-        <div class="row">
-          <span class="label">Phase</span>
-          <button class="minus-btn" onclick="decreasePhase(${id})">−</button>
-          <span class="value" id="phase-${id}">0</span>
-          <button class="plus-btn" onclick="increasePhase(${id}, '${safeName}')">+</button>
-        </div>
-        <div class="row">
-          <span class="label">Punkte</span>
-          <span class="value" id="total-${id}">0</span>
-          <button class="edit-btn" onclick="openEditModal(${id})">✎</button>
-        </div>
-        <div class="card-divider"></div>
-        <div class="row">
-          <span class="label">Runde +</span>
-          <input class="round-input" type="number" id="round-${id}" value="0" />
-          <button class="plus-btn" onclick="addPoints(${id})">+</button>
-        </div>
-      `;
-      document.getElementById('players').appendChild(card);
-    }
-
-    // ── Phase ──────────────────────────────────────────
-    function increasePhase(id, name) {
-      if (players[id].phase >= 10) return;
-      players[id].phase++;
-      const phase = players[id].phase;
-      document.getElementById('phase-' + id).textContent = phase;
-      const dot = document.getElementById(`dot-${id}-${phase}`);
-      if (dot) dot.classList.add('done');
-      if (players[id].phase >= 10) {
-        winTarget = id;
-        clearInterval(swInterval);
-        swRunning = false;
-        document.getElementById('win-text').textContent = `Herzlichen Glückwunsch, ${name}!`;
-
-        const table = document.getElementById('scoreboard');
-        table.innerHTML = `<tr><th>Spieler</th><th>Phase</th><th>Punkte</th></tr>`;
-        const sorted = Object.keys(players).sort((a, b) => players[a].total - players[b].total);
-        sorted.forEach(pid => {
-          const tr = document.createElement('tr');
-          if (parseInt(pid) === id) tr.className = 'winner';
-          tr.innerHTML = `<td>${escapeHtml(playerNames[pid])}</td><td>${players[pid].phase}</td><td>${players[pid].total}</td>`;
-          table.appendChild(tr);
-        });
-
-        document.getElementById('win-modal').classList.add('visible');
-      }
-    }
-
-    function decreasePhase(id) {
-      if (players[id].phase <= 0) return;
-      const oldPhase = players[id].phase;
-      const dot = document.getElementById(`dot-${id}-${oldPhase}`);
-      if (dot) dot.classList.remove('done');
-      players[id].phase--;
-      document.getElementById('phase-' + id).textContent = players[id].phase;
-    }
-
-    // ── Points ─────────────────────────────────────────
-    function addPoints(id) {
-      const input = document.getElementById('round-' + id);
-      const val = parseInt(input.value) || 0;
-      players[id].total += val;
-      document.getElementById('total-' + id).textContent = players[id].total;
-      input.value = '0';
-    }
-
-    function removePlayer(id) {
-      document.getElementById('player-' + id).remove();
-      delete players[id];
-      delete playerNames[id];
-    }
-
-    function playAgain() {
-      document.getElementById('win-modal').classList.remove('visible');
-      resetGame();
-    }
+    document.getElementById('edit-input').addEventListener('keydown', e => { if(e.key==='Enter') saveEdit(); });
 
     function escapeHtml(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
   </script>
 </body>
