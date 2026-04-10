@@ -338,8 +338,9 @@
     let swInterval = null;
     let swRunning = false;
     let currentTheme = 'dark';
-    let undoStack = [];      // [{id->pts added, round}]
+    let undoStack = [];      // [{pts:{id:val}, phases:{id:true}}]
     let roundEnteredIds = new Set();
+    let phaseIncreasedIds = new Set();
 
     const PLAYER_COLORS = [
       'linear-gradient(135deg,#e94560,#f5a623)',
@@ -523,19 +524,20 @@
       document.getElementById('round-bar').classList.remove('visible');
       document.getElementById('stopwatch-bar').classList.remove('visible');
       document.querySelectorAll('.remove-btn').forEach(b => b.style.display='block');
-      winTarget = null; undoStack = []; roundEnteredIds.clear(); gameStarted = false;
+      winTarget = null; undoStack = []; roundEnteredIds.clear(); phaseIncreasedIds.clear(); gameStarted = false;
       localStorage.removeItem('phase10_state');
     }
 
     function incrementRound() {
       roundCount++;
       document.getElementById('round-counter').textContent = roundCount;
-      roundEnteredIds.clear();
+      roundEnteredIds.clear(); phaseIncreasedIds.clear();
       Object.keys(players).forEach(id => {
         const card = document.getElementById('player-'+id);
         if (card) card.classList.remove('round-done');
         const chk = document.getElementById('check-'+id);
         if (chk) { chk.textContent = ''; chk.classList.remove('visible'); }
+        renderCard(id);
       });
       saveState();
     }
@@ -544,22 +546,25 @@
     function undoRound() {
       if (undoStack.length === 0) return;
       const snapshot = undoStack.pop();
-      Object.keys(snapshot).forEach(id => {
+      Object.keys(snapshot.pts||{}).forEach(id => {
         if (!players[id]) return;
-        players[id].total -= snapshot[id];
+        players[id].total -= snapshot.pts[id];
         players[id].history.pop();
-        renderCard(id);
+      });
+      Object.keys(snapshot.phases||{}).forEach(id => {
+        if (!players[id]) return;
+        const dot = document.getElementById(`dot-${id}-${players[id].phase}`);
+        if (dot) dot.classList.remove('done');
+        players[id].phase--;
       });
       if (roundCount > 1) { roundCount--; document.getElementById('round-counter').textContent = roundCount; }
-      roundEnteredIds.clear();
+      roundEnteredIds.clear(); phaseIncreasedIds.clear();
       Object.keys(players).forEach(id => {
         const card = document.getElementById('player-'+id);
         if (card) card.classList.remove('round-done');
-        const chk = document.getElementById('check-'+id);
-        if (chk) { chk.textContent = ''; chk.classList.remove('visible'); }
+        renderCard(id);
       });
-      sortCards();
-      saveState();
+      sortCards(); saveState();
     }
 
     // ── Add Player ─────────────────────────────────────────
@@ -670,6 +675,10 @@
             <span class="calc-sum" id="calcsum-${id}">${calcSum}P</span>
           </div>
           <button class="calc-add-btn" onclick="addPointsFromCalc(${id})">Hinzufügen (${calcSum}P)</button>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input class="round-input" type="number" id="manual-${id}" placeholder="Manuell" style="flex:1;width:auto" />
+            <button class="calc-add-btn" style="width:auto;padding:10px 14px" onclick="manualAddPoints(${id})">＋</button>
+          </div>
         </div>
         <div style="margin-top:4px">
           <button class="history-toggle" onclick="toggleHistory(${id})">
@@ -708,13 +717,32 @@
       // track round entries for auto-advance
       roundEnteredIds.add(String(id));
       const snapshot = undoStack[undoStack.length-1];
-      if (snapshot && !snapshot._roundDone) { snapshot[id] = (snapshot[id]||0) + sum; }
-      else { const s = {[id]: sum}; undoStack.push(s); }
+      if (snapshot && !snapshot._roundDone) { snapshot.pts[id] = (snapshot.pts[id]||0) + sum; }
+      else { undoStack.push({pts:{[id]:sum}, phases:{}}); }
 
       renderCard(id);
       sortCards();
 
       // check all players entered
+      const allIds = Object.keys(players);
+      if (allIds.every(pid => roundEnteredIds.has(pid))) {
+        setTimeout(() => { if(confirm(`Alle Spieler eingetragen! Runde ${roundCount+1} beginnen?`)) incrementRound(); }, 200);
+      }
+      saveState();
+    }
+
+    function manualAddPoints(id) {
+      const input = document.getElementById('manual-'+id);
+      const val = parseInt(input.value);
+      if (isNaN(val)) return;
+      players[id].total += val;
+      players[id].history.push({pts: val, round: roundCount});
+      input.value = '';
+      roundEnteredIds.add(String(id));
+      const snapshot = undoStack[undoStack.length-1];
+      if (snapshot) snapshot.pts[id] = (snapshot.pts[id]||0) + val;
+      else undoStack.push({pts:{[id]:val}, phases:{}});
+      renderCard(id); sortCards();
       const allIds = Object.keys(players);
       if (allIds.every(pid => roundEnteredIds.has(pid))) {
         setTimeout(() => { if(confirm(`Alle Spieler eingetragen! Runde ${roundCount+1} beginnen?`)) incrementRound(); }, 200);
@@ -770,10 +798,17 @@
     // ── Phase ──────────────────────────────────────────────
     function increasePhase(id) {
       if (players[id].phase >= 10) return;
+      if (gameStarted && phaseIncreasedIds.has(String(id))) { alert('Nur 1 Phase pro Runde möglich.'); return; }
       players[id].phase++;
       document.getElementById('phase-'+id).textContent = players[id].phase;
       const dot = document.getElementById(`dot-${id}-${players[id].phase}`);
       if (dot) dot.classList.add('done');
+      if (gameStarted) {
+        phaseIncreasedIds.add(String(id));
+        const snapshot = undoStack[undoStack.length-1];
+        if (snapshot) snapshot.phases[id] = true;
+        else undoStack.push({pts:{}, phases:{[id]:true}});
+      }
       if (players[id].phase >= 10) showWinModal(id);
       sortCards(); saveState();
     }
