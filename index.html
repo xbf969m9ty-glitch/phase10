@@ -9,25 +9,60 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+    /* ── Theme variables ─────────────────────────────── */
+    :root {
+      --bg-from:        #1a1a2e;
+      --bg-mid:         #16213e;
+      --bg-to:          #0f3460;
+      --accent1:        #e94560;
+      --accent2:        #f5a623;
+      --btn-add-from:   #667eea;
+      --btn-add-to:     #764ba2;
+      --modal-bg:       #1e2340;
+      --focus-border:   rgba(233,69,96,0.6);
+      --shadow1:        rgba(233,69,96,0.4);
+      --shadow2:        rgba(233,69,96,0.45);
+      --shadow3:        rgba(233,69,96,0.5);
+      --shadow-add:     rgba(102,126,234,0.4);
+    }
+
+    body.theme-pink {
+      --bg-from:        #2d1020;
+      --bg-mid:         #3d1535;
+      --bg-to:          #5c1550;
+      --accent1:        #ff4da6;
+      --accent2:        #ffb3d9;
+      --btn-add-from:   #e040a0;
+      --btn-add-to:     #b5179e;
+      --modal-bg:       #2d1020;
+      --focus-border:   rgba(255,77,166,0.6);
+      --shadow1:        rgba(255,77,166,0.4);
+      --shadow2:        rgba(255,77,166,0.45);
+      --shadow3:        rgba(255,77,166,0.5);
+      --shadow-add:     rgba(224,64,160,0.4);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-mid) 50%, var(--bg-to) 100%);
       min-height: 100vh;
       padding: 16px 14px 32px;
+      transition: background 0.4s ease;
     }
 
-    /* Header */
+    /* ── Header ─────────────────────────────────────── */
     .app-header {
       text-align: center;
       padding: 20px 16px 16px;
       margin-bottom: 16px;
+      position: relative;
     }
     .app-header h1 {
       font-size: 26px;
       font-weight: 800;
-      background: linear-gradient(90deg, #e94560, #f5a623, #e94560);
+      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent1));
       background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -46,7 +81,82 @@
       100% { background-position: 200% center; }
     }
 
-    /* Stoppuhr */
+    /* ── Theme button & picker ──────────────────────── */
+    .theme-btn {
+      position: absolute;
+      top: 20px;
+      right: 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+      backdrop-filter: blur(8px);
+    }
+    .theme-btn:active { transform: scale(0.93); background: rgba(255,255,255,0.18); }
+
+    .theme-picker {
+      display: none;
+      position: absolute;
+      top: 68px;
+      right: 14px;
+      background: rgba(30,35,64,0.95);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 14px;
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      flex-direction: column;
+      gap: 10px;
+      min-width: 150px;
+    }
+    .theme-picker.open { display: flex; }
+
+    .theme-picker-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: background 0.15s;
+      border: 1px solid transparent;
+    }
+    .theme-option:hover { background: rgba(255,255,255,0.07); }
+    .theme-option.active { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); }
+
+    .theme-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .swatch-dark { background: linear-gradient(135deg, #1a1a2e, #0f3460); border: 1px solid rgba(255,255,255,0.15); }
+    .swatch-pink { background: linear-gradient(135deg, #2d1020, #5c1550); border: 1px solid rgba(255,77,166,0.3); }
+
+    .theme-option span {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* ── Stoppuhr ───────────────────────────────────── */
     #stopwatch-bar {
       display: none;
       background: rgba(255,255,255,0.07);
@@ -64,12 +174,13 @@
     #stopwatch-display {
       font-size: 28px;
       font-weight: 700;
-      color: #e94560;
+      color: var(--accent1);
       letter-spacing: 3px;
       font-variant-numeric: tabular-nums;
+      transition: color 0.4s;
     }
 
-    /* Runden-Counter */
+    /* ── Runden-Counter ─────────────────────────────── */
     #round-bar {
       display: none;
       background: rgba(255,255,255,0.07);
@@ -93,12 +204,13 @@
     #round-bar .round-count {
       font-size: 26px;
       font-weight: 800;
-      color: #f5a623;
+      color: var(--accent2);
       min-width: 36px;
       text-align: center;
+      transition: color 0.4s;
     }
     .round-btn {
-      background: linear-gradient(135deg, #f5a623, #e94560);
+      background: linear-gradient(135deg, var(--accent2), var(--accent1));
       color: white;
       border: none;
       border-radius: 10px;
@@ -108,21 +220,19 @@
       cursor: pointer;
       line-height: 1;
       font-weight: 700;
-      transition: transform 0.1s, box-shadow 0.1s;
-      box-shadow: 0 4px 12px rgba(233,69,96,0.4);
+      transition: transform 0.1s, box-shadow 0.1s, background 0.4s;
+      box-shadow: 0 4px 12px var(--shadow1);
     }
     .round-btn:active { transform: scale(0.93); box-shadow: none; }
 
-    /* Buttons oben */
+    /* ── Buttons oben ───────────────────────────────── */
     .btn-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-bottom: 16px;
     }
-    .btn-group-single {
-      margin-bottom: 16px;
-    }
+    .btn-group-single { margin-bottom: 16px; }
     .top-btn {
       display: block;
       width: 100%;
@@ -138,10 +248,11 @@
     .top-btn:active { transform: scale(0.96); filter: brightness(0.9); }
 
     #add-btn {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, var(--btn-add-from), var(--btn-add-to));
       color: white;
-      box-shadow: 0 4px 16px rgba(102,126,234,0.4);
+      box-shadow: 0 4px 16px var(--shadow-add);
       grid-column: 1 / -1;
+      transition: background 0.4s, box-shadow 0.4s;
     }
     #start-btn {
       background: linear-gradient(135deg, #11998e, #38ef7d);
@@ -164,7 +275,7 @@
     }
     #cancel-btn:active { background: rgba(255,59,48,0.25); }
 
-    /* Player Cards */
+    /* ── Player Cards ───────────────────────────────── */
     .player-card {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
@@ -175,9 +286,7 @@
       animation: slideIn 0.3s ease;
       transition: box-shadow 0.2s;
     }
-    .player-card:hover {
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    }
+    .player-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -195,7 +304,7 @@
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #e94560, #f5a623);
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -203,6 +312,7 @@
       font-weight: 800;
       color: white;
       flex-shrink: 0;
+      transition: background 0.4s;
     }
     .player-name { font-size: 17px; font-weight: 700; color: white; }
 
@@ -219,7 +329,7 @@
     }
     .remove-btn:active { background: rgba(255,59,48,0.3); }
 
-    /* Phase dots */
+    /* ── Phase dots ─────────────────────────────────── */
     .phase-dots {
       display: flex;
       gap: 5px;
@@ -241,10 +351,11 @@
       transition: all 0.25s ease;
     }
     .phase-dot.done {
-      background: linear-gradient(135deg, #e94560, #f5a623);
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
       border-color: transparent;
       color: white;
-      box-shadow: 0 2px 8px rgba(233,69,96,0.5);
+      box-shadow: 0 2px 8px var(--shadow3);
+      transition: background 0.4s, box-shadow 0.4s;
     }
 
     .row {
@@ -286,6 +397,21 @@
     }
     .plus-btn:active { transform: scale(0.9); box-shadow: none; }
 
+    .minus-btn {
+      background: rgba(255,255,255,0.09);
+      color: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      font-size: 22px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.1s, background 0.15s;
+      line-height: 1;
+    }
+    .minus-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.18); }
+
     .edit-btn {
       background: rgba(255,255,255,0.1);
       color: rgba(255,255,255,0.7);
@@ -313,19 +439,18 @@
     }
     .round-input:focus {
       outline: none;
-      border-color: rgba(233,69,96,0.6);
+      border-color: var(--focus-border);
       background: rgba(255,255,255,0.12);
     }
     .round-input::placeholder { color: rgba(255,255,255,0.3); }
 
-    /* Divider */
+    /* ── Divider ────────────────────────────────────── */
     .card-divider {
       height: 1px;
       background: rgba(255,255,255,0.08);
       margin: 12px 0;
     }
 
-    /* Total score badge */
     .total-badge {
       font-size: 11px;
       color: rgba(255,255,255,0.35);
@@ -335,7 +460,7 @@
       margin-left: auto;
     }
 
-    /* Modal */
+    /* ── Modal ──────────────────────────────────────── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -349,7 +474,7 @@
     .modal-overlay.visible { display: flex; }
 
     .modal {
-      background: #1e2340;
+      background: var(--modal-bg);
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 24px 24px 0 0;
       padding: 28px 24px 36px;
@@ -357,6 +482,7 @@
       max-width: 480px;
       text-align: center;
       animation: slideUp 0.28s cubic-bezier(0.34,1.3,0.64,1);
+      transition: background 0.4s;
     }
     @keyframes slideUp {
       from { transform: translateY(60px); opacity: 0; }
@@ -391,7 +517,7 @@
     }
     .modal input:focus {
       outline: none;
-      border-color: rgba(233,69,96,0.6);
+      border-color: var(--focus-border);
       background: rgba(255,255,255,0.12);
     }
     .modal input::placeholder { color: rgba(255,255,255,0.3); }
@@ -411,8 +537,9 @@
     .modal-btns button:active { transform: scale(0.97); filter: brightness(0.9); }
 
     .btn-confirm {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, var(--btn-add-from), var(--btn-add-to));
       color: white;
+      transition: background 0.4s;
     }
     .btn-cancel {
       background: rgba(255,255,255,0.08);
@@ -420,14 +547,14 @@
       border: 1px solid rgba(255,255,255,0.12);
     }
 
-    /* Win modal */
+    /* ── Win Modal ──────────────────────────────────── */
     #win-modal .modal {
       border-radius: 24px 24px 0 0;
       max-height: 88vh;
       overflow-y: auto;
     }
     .win-trophy { font-size: 52px; margin-bottom: 8px; }
-    #win-modal .modal h2 { font-size: 26px; color: #f5a623; }
+    #win-modal .modal h2 { font-size: 26px; color: var(--accent2); transition: color 0.4s; }
     #win-modal .modal .win-sub { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 20px; margin-top: 6px; }
 
     .scoreboard {
@@ -452,16 +579,13 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
       font-weight: 500;
     }
-    .scoreboard tr.winner td {
-      font-weight: 800;
-      color: #f5a623;
-    }
+    .scoreboard tr.winner td { font-weight: 800; color: var(--accent2); transition: color 0.4s; }
     .scoreboard tr.winner td:first-child::before { content: '🏆 '; }
 
     #win-modal .modal button {
       width: 100%;
       padding: 15px;
-      background: linear-gradient(135deg, #e94560, #f5a623);
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
       color: white;
       border: none;
       border-radius: 14px;
@@ -469,12 +593,12 @@
       font-weight: 800;
       cursor: pointer;
       font-family: inherit;
-      box-shadow: 0 6px 20px rgba(233,69,96,0.45);
-      transition: filter 0.15s, transform 0.1s;
+      box-shadow: 0 6px 20px var(--shadow2);
+      transition: filter 0.15s, transform 0.1s, background 0.4s;
     }
     #win-modal .modal button:active { transform: scale(0.97); filter: brightness(0.9); }
 
-    /* Abbrechen-Bestätigung */
+    /* ── Abbrechen-Bestätigung ──────────────────────── */
     #cancel-modal .modal p {
       font-size: 15px;
       color: rgba(255,255,255,0.5);
@@ -485,7 +609,7 @@
       background: linear-gradient(135deg, #ff3b30, #ff6b6b);
     }
 
-    /* Scrollbar */
+    /* ── Scrollbar ──────────────────────────────────── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
@@ -496,6 +620,18 @@
   <div class="app-header">
     <h1>Phase 10</h1>
     <div class="subtitle">Punkterechner</div>
+    <button class="theme-btn" onclick="toggleThemePicker()" title="Design ändern">🎨</button>
+    <div class="theme-picker" id="theme-picker">
+      <div class="theme-picker-title">Design</div>
+      <div class="theme-option active" id="opt-dark" onclick="setTheme('dark')">
+        <div class="theme-swatch swatch-dark"></div>
+        <span>Nacht</span>
+      </div>
+      <div class="theme-option" id="opt-pink" onclick="setTheme('pink')">
+        <div class="theme-swatch swatch-pink"></div>
+        <span>Pink</span>
+      </div>
+    </div>
   </div>
 
   <!-- Stoppuhr -->
@@ -583,6 +719,30 @@
     let swInterval = null;
     let swRunning = false;
 
+    // ── Theme ──────────────────────────────────────────
+    let currentTheme = 'dark';
+
+    function toggleThemePicker() {
+      document.getElementById('theme-picker').classList.toggle('open');
+    }
+
+    function setTheme(theme) {
+      currentTheme = theme;
+      document.body.classList.toggle('theme-pink', theme === 'pink');
+      document.getElementById('opt-dark').classList.toggle('active', theme === 'dark');
+      document.getElementById('opt-pink').classList.toggle('active', theme === 'pink');
+      document.getElementById('theme-picker').classList.remove('open');
+    }
+
+    // Close picker when clicking outside
+    document.addEventListener('click', e => {
+      const picker = document.getElementById('theme-picker');
+      if (!picker.contains(e.target) && !e.target.closest('.theme-btn')) {
+        picker.classList.remove('open');
+      }
+    });
+
+    // ── Stopwatch ──────────────────────────────────────
     function formatTime(s) {
       const h = Math.floor(s / 3600);
       const m = Math.floor((s % 3600) / 60);
@@ -595,7 +755,6 @@
         alert('Bitte zuerst mindestens einen Spieler hinzufügen.');
         return;
       }
-      // UI umschalten
       document.getElementById('add-btn').style.display = 'none';
       document.getElementById('start-btn').style.display = 'none';
       document.getElementById('pause-btn').style.display = 'block';
@@ -603,10 +762,8 @@
       document.getElementById('round-bar').classList.add('visible');
       document.getElementById('stopwatch-bar').classList.add('visible');
 
-      // Entfernen-Buttons verstecken
       document.querySelectorAll('.remove-btn').forEach(b => b.style.display = 'none');
 
-      // Stoppuhr starten
       swSeconds = 0;
       swRunning = true;
       swInterval = setInterval(() => {
@@ -644,14 +801,12 @@
     }
 
     function resetGame() {
-      // Stoppuhr stoppen
       clearInterval(swInterval);
       swInterval = null;
       swRunning = false;
       swSeconds = 0;
       document.getElementById('stopwatch-display').textContent = '00:00';
 
-      // Spieler zurücksetzen
       Object.keys(players).forEach(id => {
         players[id].phase = 0;
         players[id].total = 0;
@@ -664,21 +819,18 @@
         }
       });
 
-      // Runden-Counter zurücksetzen
       roundCount = 1;
       document.getElementById('round-counter').textContent = '1';
 
-      // UI zurücksetzen
       document.getElementById('add-btn').style.display = 'block';
       document.getElementById('start-btn').style.display = 'block';
       document.getElementById('pause-btn').style.display = 'none';
-      document.getElementById('pause-btn').textContent = 'Pause';
-      document.getElementById('pause-btn').style.background = '#ff9500';
+      document.getElementById('pause-btn').textContent = '⏸ Pause';
+      document.getElementById('pause-btn').style.background = 'linear-gradient(135deg, #f5a623, #f7b733)';
       document.getElementById('cancel-btn').style.display = 'none';
       document.getElementById('round-bar').classList.remove('visible');
       document.getElementById('stopwatch-bar').classList.remove('visible');
 
-      // Entfernen-Buttons wieder anzeigen
       document.querySelectorAll('.remove-btn').forEach(b => b.style.display = 'block');
 
       winTarget = null;
@@ -689,6 +841,7 @@
       document.getElementById('round-counter').textContent = roundCount;
     }
 
+    // ── Add Player ─────────────────────────────────────
     function openAddModal() {
       document.getElementById('name-input').value = '';
       document.getElementById('add-modal').classList.add('visible');
@@ -703,6 +856,7 @@
       if (e.key === 'Enter') addPlayer();
     });
 
+    // ── Edit Points ────────────────────────────────────
     function openEditModal(id) {
       editTarget = id;
       document.getElementById('edit-input').value = players[id].total;
@@ -729,6 +883,7 @@
       if (e.key === 'Enter') saveEdit();
     });
 
+    // ── Add Player ─────────────────────────────────────
     function addPlayer() {
       const name = document.getElementById('name-input').value.trim();
       if (!name) return;
@@ -759,6 +914,7 @@
         <div class="card-divider"></div>
         <div class="row">
           <span class="label">Phase</span>
+          <button class="minus-btn" onclick="decreasePhase(${id})">−</button>
           <span class="value" id="phase-${id}">0</span>
           <button class="plus-btn" onclick="increasePhase(${id}, '${safeName}')">+</button>
         </div>
@@ -777,11 +933,12 @@
       document.getElementById('players').appendChild(card);
     }
 
+    // ── Phase ──────────────────────────────────────────
     function increasePhase(id, name) {
+      if (players[id].phase >= 10) return;
       players[id].phase++;
       const phase = players[id].phase;
       document.getElementById('phase-' + id).textContent = phase;
-      // Update dot
       const dot = document.getElementById(`dot-${id}-${phase}`);
       if (dot) dot.classList.add('done');
       if (players[id].phase >= 10) {
@@ -804,6 +961,16 @@
       }
     }
 
+    function decreasePhase(id) {
+      if (players[id].phase <= 0) return;
+      const oldPhase = players[id].phase;
+      const dot = document.getElementById(`dot-${id}-${oldPhase}`);
+      if (dot) dot.classList.remove('done');
+      players[id].phase--;
+      document.getElementById('phase-' + id).textContent = players[id].phase;
+    }
+
+    // ── Points ─────────────────────────────────────────
     function addPoints(id) {
       const input = document.getElementById('round-' + id);
       const val = parseInt(input.value) || 0;
