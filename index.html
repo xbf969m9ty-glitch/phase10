@@ -660,9 +660,14 @@
           <button class="plus-btn" onclick="increasePhase(${id})">+</button>
         </div>
         <div class="row">
-          <span class="label">Punkte</span>
+          <span class="label">Gesamt Punktzahl</span>
           <span class="value" id="total-${id}">${p.total}</span>
           <button class="edit-btn" onclick="openEditModal(${id})">✎</button>
+        </div>
+        <div class="row">
+          <span class="label">Rundenpunkte</span>
+          <input class="round-input" type="number" id="roundpts-${id}" value="${calcSum}" style="flex:1;min-width:0" />
+          <button class="plus-btn" onclick="saveRoundPoints(${id})">✓</button>
         </div>
         <div class="card-divider"></div>
         <div class="card-calc">
@@ -670,15 +675,6 @@
             ${CARD_TYPES.map(t=>`<div class="calc-type-btn" onclick="calcChange(${id},'${t.key}',1)"><div class="lbl">${t.label}</div><div class="pts">+${t.pts}P</div></div>`).join('')}
           </div>
           ${calcItemsHtml}
-          <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px">
-            <span style="font-size:13px;color:rgba(255,255,255,0.5);font-weight:600">Summe:</span>
-            <span class="calc-sum" id="calcsum-${id}">${calcSum}P</span>
-          </div>
-          <button class="calc-add-btn" onclick="addPointsFromCalc(${id})">Hinzufügen (${calcSum}P)</button>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input class="round-input" type="number" id="manual-${id}" placeholder="Manuell" style="flex:1;width:auto" />
-            <button class="calc-add-btn" style="width:auto;padding:10px 14px" onclick="manualAddPoints(${id})">＋</button>
-          </div>
         </div>
         <div style="margin-top:4px">
           <button class="history-toggle" onclick="toggleHistory(${id})">
@@ -701,43 +697,18 @@
       const sum = calcCurrentSum(id);
       const countEl = document.getElementById(`calc-${id}-${key}`);
       if (countEl) countEl.textContent = players[id].calcItems[key];
-      const sumEl = document.getElementById(`calcsum-${id}`);
-      if (sumEl) sumEl.textContent = sum+'P';
-      const addBtn = document.querySelector(`#player-${id} .calc-add-btn`);
-      if (addBtn) addBtn.textContent = `Hinzufügen (${sum}P)`;
+      const rptInput = document.getElementById(`roundpts-${id}`);
+      if (rptInput) rptInput.value = sum;
       saveState();
     }
 
-    function addPointsFromCalc(id) {
-      const sum = calcCurrentSum(id);
-      players[id].total += sum;
-      players[id].history.push({pts: sum, round: roundCount});
-      players[id].calcItems = {low:0,high:0,skip:0,wild:0};
-
-      // track round entries for auto-advance
-      roundEnteredIds.add(String(id));
-      const snapshot = undoStack[undoStack.length-1];
-      if (snapshot && !snapshot._roundDone) { snapshot.pts[id] = (snapshot.pts[id]||0) + sum; }
-      else { undoStack.push({pts:{[id]:sum}, phases:{}}); }
-
-      renderCard(id);
-      sortCards();
-
-      // check all players entered
-      const allIds = Object.keys(players);
-      if (allIds.every(pid => roundEnteredIds.has(pid))) {
-        setTimeout(() => { if(confirm(`Alle Spieler eingetragen! Runde ${roundCount+1} beginnen?`)) incrementRound(); }, 200);
-      }
-      saveState();
-    }
-
-    function manualAddPoints(id) {
-      const input = document.getElementById('manual-'+id);
+    function saveRoundPoints(id) {
+      const input = document.getElementById('roundpts-'+id);
       const val = parseInt(input.value);
       if (isNaN(val)) return;
       players[id].total += val;
       players[id].history.push({pts: val, round: roundCount});
-      input.value = '';
+      players[id].calcItems = {low:0,high:0,skip:0,wild:0};
       roundEnteredIds.add(String(id));
       const snapshot = undoStack[undoStack.length-1];
       if (snapshot) snapshot.pts[id] = (snapshot.pts[id]||0) + val;
@@ -879,3 +850,4 @@
   </script>
 </body>
 </html>
+
