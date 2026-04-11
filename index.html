@@ -116,7 +116,7 @@
     .phase-dot.done{border-color:transparent;color:white;box-shadow:0 2px 8px var(--shadow3)}
 
     .row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-    .label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);width:80px;text-transform:uppercase;letter-spacing:0.8px}
+  .label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);width:120px;text-transform:uppercase;letter-spacing:0.8px}
     .value{font-size:20px;font-weight:800;min-width:44px;text-align:center;color:white}
 
     .plus-btn{background:linear-gradient(135deg,#11998e,#38ef7d);color:white;border:none;border-radius:10px;width:38px;height:38px;font-size:22px;cursor:pointer;font-weight:700;transition:transform 0.1s,box-shadow 0.1s;box-shadow:0 3px 10px rgba(56,239,125,0.35)}
@@ -157,6 +157,11 @@
     .history-edit-input{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:white;font-size:13px;width:60px;padding:2px 6px;font-family:inherit;text-align:center}
     .history-edit-input:focus{outline:none;border-color:var(--focus-border)}
 
+    /* disabled controls styling */
+    button[disabled], .calc-type-btn[disabled], .calc-mini-btn[disabled], input[disabled] {
+      opacity: 0.45; cursor: not-allowed; pointer-events: none;
+    }
+
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);justify-content:center;align-items:flex-end;z-index:100;backdrop-filter:blur(6px)}
     .modal-overlay.visible{display:flex}
     .modal{background:var(--modal-bg);border:1px solid rgba(255,255,255,0.12);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;text-align:center;animation:slideUp 0.28s cubic-bezier(0.34,1.3,0.64,1);transition:background 0.4s}
@@ -166,6 +171,9 @@
     .modal input{width:100%;padding:14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;font-size:16px;font-family:inherit;color:white;margin-bottom:16px}
     .modal input:focus{outline:none;border-color:var(--focus-border);background:rgba(255,255,255,0.12)}
     .modal input::placeholder{color:rgba(255,255,255,0.3)}
+  /* Rundenpunkte Eingabefeld (kleiner) */
+  .round-input{width:88px;max-width:40%;padding:8px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:white;font-size:15px;text-align:center;flex:0 0 auto}
+  .round-input:focus{outline:none;border-color:var(--focus-border);background:rgba(255,255,255,0.12)}
     .modal-btns{display:flex;gap:10px}
     .modal-btns button{flex:1;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter 0.15s,transform 0.1s}
     .modal-btns button:active{transform:scale(0.97);filter:brightness(0.9)}
@@ -480,6 +488,8 @@
       gameStarted = true;
       gameStartTime = Date.now();
       showGameUI();
+      // enable UI controls for all player cards
+      Object.keys(players).forEach(id => renderCard(id));
       swSeconds = 0;
       swRunning = true;
       swInterval = setInterval(() => { if(swRunning){swSeconds++;document.getElementById('stopwatch-display').textContent=formatTime(swSeconds);saveState();} }, 1000);
@@ -624,9 +634,9 @@
         <div class="calc-item">
           <span class="calc-item-lbl">${t.label} (${t.pts}P)</span>
           <div class="calc-item-ctrl">
-            <button class="calc-mini-btn" onclick="calcChange(${id},'${t.key}',-1)">−</button>
+            <button class="calc-mini-btn" ${gameStarted ? '' : 'disabled'} onclick="calcChange(${id},'${t.key}',-1)">−</button>
             <span class="calc-count" id="calc-${id}-${t.key}">${p.calcItems[t.key]||0}</span>
-            <button class="calc-mini-btn" onclick="calcChange(${id},'${t.key}',1)">+</button>
+            <button class="calc-mini-btn" ${gameStarted ? '' : 'disabled'} onclick="calcChange(${id},'${t.key}',1)">+</button>
           </div>
         </div>`).join('');
 
@@ -655,24 +665,24 @@
         <div class="card-divider"></div>
         <div class="row">
           <span class="label">Phase</span>
-          <button class="minus-btn" onclick="decreasePhase(${id})">−</button>
+          <button class="minus-btn" ${gameStarted ? '' : 'disabled'} onclick="decreasePhase(${id})">−</button>
           <span class="value" id="phase-${id}">${p.phase}</span>
-          <button class="plus-btn" onclick="increasePhase(${id})">+</button>
+          <button class="plus-btn" ${gameStarted ? '' : 'disabled'} onclick="increasePhase(${id})">+</button>
         </div>
         <div class="row">
           <span class="label">Gesamt Punktzahl</span>
           <span class="value" id="total-${id}">${p.total}</span>
-          <button class="edit-btn" onclick="openEditModal(${id})">✎</button>
+          <button class="edit-btn" ${gameStarted ? '' : 'disabled'} onclick="openEditModal(${id})">✎</button>
         </div>
         <div class="row">
           <span class="label">Rundenpunkte</span>
-          <input class="round-input" type="number" id="roundpts-${id}" value="${calcSum}" style="flex:1;min-width:0" />
-          <button class="plus-btn" onclick="saveRoundPoints(${id})">✓</button>
+          <input class="round-input" type="number" id="roundpts-${id}" value="${calcSum}" ${gameStarted ? '' : 'disabled'} />
+          <button class="plus-btn" ${gameStarted ? '' : 'disabled'} onclick="saveRoundPoints(${id})">✓</button>
         </div>
         <div class="card-divider"></div>
         <div class="card-calc">
           <div class="calc-btns">
-            ${CARD_TYPES.map(t=>`<div class="calc-type-btn" onclick="calcChange(${id},'${t.key}',1)"><div class="lbl">${t.label}</div><div class="pts">+${t.pts}P</div></div>`).join('')}
+            ${CARD_TYPES.map(t=>`<button class="calc-type-btn" ${gameStarted ? '' : 'disabled'} onclick="calcChange(${id},'${t.key}',1)"><div class="lbl">${t.label}</div><div class="pts">+${t.pts}P</div></button>`).join('')}
           </div>
           ${calcItemsHtml}
         </div>
@@ -692,6 +702,7 @@
     }
 
     function calcChange(id, key, delta) {
+      if (!gameStarted) { alert('Spiel noch nicht gestartet. Bitte zuerst auf "Spiel starten" drücken.'); return; }
       if (!players[id].calcItems) players[id].calcItems = {};
       players[id].calcItems[key] = Math.max(0, (players[id].calcItems[key]||0) + delta);
       const sum = calcCurrentSum(id);
@@ -703,6 +714,7 @@
     }
 
     function saveRoundPoints(id) {
+      if (!gameStarted) { alert('Spiel noch nicht gestartet. Bitte zuerst auf "Spiel starten" drücken.'); return; }
       const input = document.getElementById('roundpts-'+id);
       const val = parseInt(input.value);
       if (isNaN(val)) return;
@@ -768,6 +780,7 @@
 
     // ── Phase ──────────────────────────────────────────────
     function increasePhase(id) {
+      if (!gameStarted) { alert('Spiel noch nicht gestartet. Bitte zuerst auf "Spiel starten" drücken.'); return; }
       if (players[id].phase >= 10) return;
       if (gameStarted && phaseIncreasedIds.has(String(id))) { alert('Nur 1 Phase pro Runde möglich.'); return; }
       players[id].phase++;
@@ -785,6 +798,7 @@
     }
 
     function decreasePhase(id) {
+      if (!gameStarted) { alert('Spiel noch nicht gestartet. Bitte zuerst auf "Spiel starten" drücken.'); return; }
       if (players[id].phase <= 0) return;
       const dot = document.getElementById(`dot-${id}-${players[id].phase}`);
       if (dot) dot.classList.remove('done');
@@ -830,6 +844,7 @@
 
     // ── Edit Points ────────────────────────────────────────
     function openEditModal(id) {
+      if (!gameStarted) { alert('Spiel noch nicht gestartet. Bitte zuerst auf "Spiel starten" drücken.'); return; }
       editTarget = id;
       document.getElementById('edit-input').value = players[id].total;
       document.getElementById('edit-modal').classList.add('visible');
@@ -837,6 +852,7 @@
     }
     function closeEditModal() { document.getElementById('edit-modal').classList.remove('visible'); editTarget = null; }
     function saveEdit() {
+      if (!gameStarted) { alert('Spiel noch nicht gestartet. Bitte zuerst auf "Spiel starten" drücken.'); return; }
       if (editTarget === null) return;
       const val = parseInt(document.getElementById('edit-input').value);
       if (!isNaN(val)) { players[editTarget].total = val; document.getElementById('total-'+editTarget).textContent = val; }
@@ -850,4 +866,3 @@
   </script>
 </body>
 </html>
-
