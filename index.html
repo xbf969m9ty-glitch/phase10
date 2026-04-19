@@ -769,13 +769,10 @@
     // ── Sorting ────────────────────────────────────────────
     function sortCards() {
       const container = document.getElementById('players');
-      const ids = Object.keys(players);
-      ids.sort((a,b) => {
-        const pd = players[b].phase - players[a].phase;
-        if (pd !== 0) return pd;
-        return players[a].total - players[b].total;
+      playerOrder.forEach(id => {
+        const el = document.getElementById('player-'+id);
+        if (el) container.appendChild(el);
       });
-      ids.forEach(id => container.appendChild(document.getElementById('player-'+id)));
     }
 
     // ── Phase ──────────────────────────────────────────────
